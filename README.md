@@ -12,6 +12,7 @@ et du DataOps d'une entreprise multi-millions d'euros, stack 100% gratuite.
 - [`docs/REFONTE-ERP.md`](docs/REFONTE-ERP.md) — diagnostic, mapping et migration de l'ERP legacy simulé
 - [`docs/DATA-CONTRACTS.md`](docs/DATA-CONTRACTS.md) — contrats JSON Schema, DLQ et classification RGPD
 - [`docs/DBT.md`](docs/DBT.md) — entrepôt dbt : couches, MDM, écarts Réel/Budget, allocations, tests
+- [`docs/N8N.md`](docs/N8N.md) — les 5 workflows, réconciliation SIRET, piège SSL Node.js
 
 ## Démarrer l'infra locale
 
@@ -29,7 +30,9 @@ Postgres (dbt dev) `5434`, n8n `5678`, Ollama `11434`.
 > télécharge un modèle). Pour les conteneurs : `./scripts/fix-local-ssl.ps1`
 > (auto-détecte Avast ; `-List` pour identifier le bon certificat sur une
 > autre machine, `-CertPattern "..."` pour le cibler), puis `docker restart
-> <conteneur>` pour qu'il recharge son pool de certificats.
+> <conteneur>` pour qu'il recharge son pool de certificats. **n8n en plus** :
+> Node.js a son propre magasin de certificats (`NODE_EXTRA_CA_CERTS`, déjà
+> configuré dans `docker-compose.yml`) — voir [`docs/N8N.md`](docs/N8N.md).
 
 ## Environnement Python
 
@@ -66,10 +69,15 @@ cohérents avec les IDs clients/produits MySQL) dans MongoDB
 Compte owner créé au setup, identifiants dans `.env`
 (`N8N_ADMIN_EMAIL`/`N8N_ADMIN_PASSWORD`). Interface : http://localhost:5678
 
-Un premier workflow de test existe (`Test - Webhook vers log`, actif) :
-`POST http://localhost:5678/webhook/test-log` déclenche un node `Set` qui
-horodate la réception — sert de gabarit pour les workflows du Sprint 5
-(reverse ETL, alerting, veille).
+```bash
+./.venv/Scripts/python.exe n8n/import_workflows.py
+```
+
+Importe les 5 workflows versionnés (`n8n/workflows/*.json`) : clôture
+mensuelle, alerting budgétaire, veille stratégique, notification de
+changement de schéma, webhook de test. Recrée les credentials Postgres/MinIO
+automatiquement. Détail, limites et résultats réels :
+[`docs/N8N.md`](docs/N8N.md).
 
 ## Ollama
 

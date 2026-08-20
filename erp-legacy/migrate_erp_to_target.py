@@ -86,7 +86,7 @@ def get_clients_crm():
         database="crm",
     )
     cur = conn.cursor()
-    cur.execute("SELECT client_id, libelle FROM dim_client")
+    cur.execute("SELECT client_id, libelle, siret FROM dim_client")
     rows = cur.fetchall()
     cur.close()
     conn.close()
@@ -94,24 +94,31 @@ def get_clients_crm():
 
 
 def reconcile_clients(clients_crm):
-    """Fuzzy-match chaque client legacy contre le référentiel CRM.
-    Retourne un dict cdcli -> (client_crm_id_propose, score) et la liste
-    brute pour l'éval précision/rappel."""
-    choices = {client_id: normalize(libelle) for client_id, libelle in clients_crm}
+    """Réconcilie chaque client legacy contre le référentiel CRM en 2 passes :
+    1) SIRET exact (fiable, désambiguïse les homonymes) si présent des deux côtés
+    2) sinon fuzzy-match sur le nom (comme avant, plafonné par les homonymes -
+       dette #5/#6 : ~20% des lignes legacy n'ont pas de SIRET, cf. générateur)
+    Retourne un dict cdcli -> (client_crm_id_propose, score, methode) et la
+    liste brute pour l'éval précision/rappel."""
+    par_siret = {siret: client_id for client_id, libelle, siret in clients_crm if siret}
+    choices = {client_id: normalize(libelle) for client_id, libelle, siret in clients_crm}
     choices_inv = {v: k for k, v in choices.items()}  # collisions improbables sur ce volume
 
     resultats = {}
     verite_terrain = []
     with open(os.path.join(EXPORT_DIR, "REF_CLIENT_LEGACY.csv"), encoding="latin-1") as f:
         for row in csv.DictReader(f, delimiter=";"):
-            nom_norm = normalize(row["rscli"])
-            match = process.extractOne(nom_norm, choices_inv.keys(), scorer=fuzz.WRatio)
-            propose_id, score = None, 0
-            if match:
-                matched_name, score, _ = match
-                if score >= SEUIL_MATCH:
-                    propose_id = choices_inv[matched_name]
-            resultats[row["cdcli"]] = (propose_id, score)
+            propose_id, score, methode = None, 0, None
+            if row.get("siret") and row["siret"] in par_siret:
+                propose_id, score, methode = par_siret[row["siret"]], 100.0, "siret"
+            else:
+                nom_norm = normalize(row["rscli"])
+                match = process.extractOne(nom_norm, choices_inv.keys(), scorer=fuzz.WRatio)
+                if match:
+                    matched_name, score, _ = match
+                    if score >= SEUIL_MATCH:
+                        propose_id, methode = choices_inv[matched_name], "nom"
+            resultats[row["cdcli"]] = (propose_id, score, methode)
             verite_terrain.append((
                 row["cdcli"],
                 row["rscli"],
@@ -154,7 +161,7 @@ def clean_lignes(reconciliation):
     non mappé."""
     lignes = []
     for row in read_bronze_erp_lignes():
-        client_crm_id, score = reconciliation.get(row["CDCLI"], (None, 0))
+        client_crm_id, score, methode = reconciliation.get(row["CDCLI"], (None, 0, None))
         date_piece = parse_date(row["DTPCE"])
         centre = MAPPING_CDCC.get(row["CDCC"].strip())
         motifs = []
@@ -165,6 +172,7 @@ def clean_lignes(reconciliation):
             "cdcli": row["CDCLI"],
             "client_crm_id_propose": client_crm_id,
             "score_matching": round(score, 1),
+            "methode_matching": methode,
             "centre_cout_libelle": centre,
             "compte_code": row["CDCPT"],
             "date_piece": date_piece,
@@ -190,20 +198,22 @@ def load_to_postgres(lignes, verite_terrain):
     cur.execute("""CREATE TABLE erp_migre.client_reconciliation (
         cdcli VARCHAR(20) PRIMARY KEY, rscli VARCHAR(200), client_crm_id_verite INT,
         client_crm_id_propose INT)""")
-    cur.execute("""CREATE TABLE IF NOT EXISTS erp_migre.fact_ventes_erp_migre (
+    # CASCADE : les vues dbt (public_staging.stg_erp__fact_ventes_migre) qui
+    # dependent de cette table sont recreees par le prochain `dbt build`.
+    cur.execute("DROP TABLE IF EXISTS erp_migre.fact_ventes_erp_migre CASCADE")
+    cur.execute("""CREATE TABLE erp_migre.fact_ventes_erp_migre (
         numpce VARCHAR(20) PRIMARY KEY, cdcli VARCHAR(20),
-        client_crm_id_propose INT, score_matching NUMERIC,
+        client_crm_id_propose INT, score_matching NUMERIC, methode_matching VARCHAR(10),
         centre_cout_libelle VARCHAR(50), compte_code VARCHAR(10),
         date_piece DATE, montant_ht NUMERIC, montant_tva NUMERIC,
         montant_ttc NUMERIC, ligne_valide BOOLEAN, motif_rejet VARCHAR(100))""")
 
-    cur.execute("TRUNCATE erp_migre.fact_ventes_erp_migre")
     cur.executemany(
         "INSERT INTO erp_migre.client_reconciliation VALUES (%s, %s, %s, %s)",
         verite_terrain)
     cur.executemany(
         """INSERT INTO erp_migre.fact_ventes_erp_migre VALUES
-        (%(numpce)s, %(cdcli)s, %(client_crm_id_propose)s, %(score_matching)s,
+        (%(numpce)s, %(cdcli)s, %(client_crm_id_propose)s, %(score_matching)s, %(methode_matching)s,
          %(centre_cout_libelle)s, %(compte_code)s, %(date_piece)s,
          %(montant_ht)s, %(montant_tva)s, %(montant_ttc)s,
          %(ligne_valide)s, %(motif_rejet)s)""",
@@ -243,6 +253,9 @@ def demo():
     lignes = clean_lignes(reconciliation)
 
     assert 0 <= precision <= 1 and 0 <= rappel <= 1 and 0 <= f1 <= 1
+    assert precision > 0.75, (
+        f"precision {precision:.1%} trop basse - le matching SIRET (dette #5) "
+        "a-t-il regresse vers le seul fuzzy-match sur le nom (54%) ?")
     assert len(lignes) > 0
     assert all(l["ligne_valide"] or l["motif_rejet"] for l in lignes), \
         "une ligne invalide doit toujours porter un motif"

@@ -1,0 +1,120 @@
+{
+  "name": "Cloture mensuelle - Export ecarts",
+  "nodes": [
+    {
+      "id": "trig1",
+      "name": "Declenchement",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        300
+      ],
+      "webhookId": "33a133f3-c78d-431e-8d79-873178c80613",
+      "parameters": {
+        "path": "trigger-cloture-mensuelle",
+        "httpMethod": "POST",
+        "responseMode": "onReceived",
+        "options": {}
+      }
+    },
+    {
+      "id": "pg1",
+      "name": "Lire ecarts Reel-Budget",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT periode, centre_cout_id, compte_id, montant_reel, montant_budget, ecart, ecart_pct FROM public_marts.fct_ecarts_reel_budget WHERE montant_reel IS NOT NULL AND montant_budget IS NOT NULL ORDER BY periode, centre_cout_id",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "R6wveCCfUaQdMMKM",
+          "name": "Postgres dbt-dev"
+        }
+      }
+    },
+    {
+      "id": "xls1",
+      "name": "Generer XLSX",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 2,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "operation": "toFile",
+        "fileFormat": "xlsx",
+        "binaryPropertyName": "data",
+        "options": {}
+      }
+    },
+    {
+      "id": "s3upload1",
+      "name": "Deposer sur Drive (simule via MinIO)",
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        920,
+        300
+      ],
+      "parameters": {
+        "resource": "file",
+        "operation": "upload",
+        "bucketName": "gold-exports",
+        "binaryData": true,
+        "binaryPropertyName": "data",
+        "fileName": "={{ 'cloture/liasse_ecarts_' + $now.toFormat('yyyy-MM') + '.xlsx' }}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "s3": {
+          "id": "3lHrDYdCa6box7ra",
+          "name": "MinIO Bronze"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Declenchement": {
+      "main": [
+        [
+          {
+            "node": "Lire ecarts Reel-Budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lire ecarts Reel-Budget": {
+      "main": [
+        [
+          {
+            "node": "Generer XLSX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generer XLSX": {
+      "main": [
+        [
+          {
+            "node": "Deposer sur Drive (simule via MinIO)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {}
+}

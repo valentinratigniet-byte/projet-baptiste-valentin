@@ -1,7 +1,7 @@
 # Démarrage rapide
 
 Roadmap simple pour faire tourner le projet tel qu'il existe aujourd'hui
-(Sprints 1 à 4 terminés). Pour le plan de développement complet, voir
+(Sprints 1 à 5 terminés). Pour le plan de développement complet, voir
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Prérequis
@@ -34,13 +34,16 @@ migration ERP → chargement `raw` → dbt). Changer l'ordre fait planter une
    ```
    Premier lancement = téléchargement des images, peut prendre quelques minutes.
 
-4. **Si les appels HTTPS d'un conteneur échouent** (ex: `ollama pull` avec une
-   erreur de certificat) — antivirus/proxy qui intercepte le HTTPS sur cette
-   machine :
+4. **Si les appels HTTPS d'un conteneur échouent** (ex: `ollama pull`, ou le
+   workflow de veille n8n) — antivirus/proxy qui intercepte le HTTPS sur
+   cette machine :
    ```powershell
-   ./scripts/fix-local-ssl.ps1
-   docker restart bv-ollama   # ou le conteneur concerné
+   ./scripts/fix-local-ssl.ps1 -Containers bv-ollama
+   ./scripts/fix-local-ssl.ps1 -Containers bv-n8n
+   docker restart bv-ollama bv-n8n
    ```
+   n8n (Node.js) a en plus besoin de `NODE_EXTRA_CA_CERTS` (déjà dans
+   `docker-compose.yml`) — voir [`docs/N8N.md`](docs/N8N.md) si ça persiste.
 
 5. **Créer l'environnement Python** (isolé, ne touche pas aux autres projets)
    ```bash
@@ -70,13 +73,21 @@ migration ERP → chargement `raw` → dbt). Changer l'ordre fait planter une
    68 tests doivent passer. Les marts (`fct_ecarts_reel_budget`, `dim_client`
    golden record, etc.) sont dans le schéma `public_marts` de Postgres.
 
-9. **Vérifier que ça tourne**
-   - MinIO console : http://localhost:9001 (buckets `bronze`/`rejects`)
-   - n8n : http://localhost:5678 (identifiants dans `.env`)
-   - Ollama : `curl http://localhost:11434/api/tags`
-   - Postgres : `docker exec bv-postgres-dbtdev psql -U dbt_user -d dbt_dev -c "SELECT * FROM public_marts.fct_allocation_couts;"`
+9. **Importer et activer les workflows n8n**
+   ```bash
+   ./.venv/Scripts/python.exe n8n/import_workflows.py
+   ```
+   Recrée les credentials (Postgres, MinIO) et importe les 5 workflows,
+   déjà activés.
 
-10. **Tout arrêter** (les données restent dans les volumes Docker)
+10. **Vérifier que ça tourne**
+    - MinIO console : http://localhost:9001 (buckets `bronze`/`rejects`/`gold-exports`/`veille`)
+    - n8n : http://localhost:5678 (identifiants dans `.env`)
+    - Ollama : `curl http://localhost:11434/api/tags`
+    - Postgres : `docker exec bv-postgres-dbtdev psql -U dbt_user -d dbt_dev -c "SELECT * FROM public_marts.fct_allocation_couts;"`
+    - n8n : `curl -X POST http://localhost:5678/webhook/trigger-cloture-mensuelle`
+
+11. **Tout arrêter** (les données restent dans les volumes Docker)
     ```bash
     docker compose down
     ```

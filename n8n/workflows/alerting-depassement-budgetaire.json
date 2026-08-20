@@ -1,0 +1,113 @@
+{
+  "name": "Alerting depassement budgetaire",
+  "nodes": [
+    {
+      "id": "trig1",
+      "name": "Declenchement",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        300
+      ],
+      "webhookId": "8f6c2f2a-1a2b-4c3d-9e0f-1a2b3c4d5e6f",
+      "parameters": {
+        "path": "trigger-alerting-budget",
+        "httpMethod": "POST",
+        "responseMode": "onReceived",
+        "options": {}
+      }
+    },
+    {
+      "id": "pg1",
+      "name": "Detecter depassements",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT e.periode, cc.libelle AS centre, c.libelle AS compte, e.montant_reel, e.montant_budget, e.ecart, e.ecart_pct FROM public_marts.fct_ecarts_reel_budget e JOIN public_marts.dim_centre_cout cc ON cc.centre_cout_id = e.centre_cout_id JOIN public_marts.dim_compte c ON c.compte_id = e.compte_id WHERE e.ecart_pct IS NOT NULL AND ABS(e.ecart_pct) > 20 ORDER BY ABS(e.ecart_pct) DESC",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "R6wveCCfUaQdMMKM",
+          "name": "Postgres dbt-dev"
+        }
+      }
+    },
+    {
+      "id": "set1",
+      "name": "Formater alerte",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "message",
+              "value": "={{ '⚠️ Dépassement budgétaire — ' + $json.centre + ' / ' + $json.compte + ' (' + $json.periode + ') : réel ' + $json.montant_reel + '€ vs budget ' + $json.montant_budget + '€, écart ' + $json.ecart_pct + '%' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "noop1",
+      "name": "Alerte prete (brancher Discord-Slack ici)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        920,
+        300
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Declenchement": {
+      "main": [
+        [
+          {
+            "node": "Detecter depassements",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detecter depassements": {
+      "main": [
+        [
+          {
+            "node": "Formater alerte",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formater alerte": {
+      "main": [
+        [
+          {
+            "node": "Alerte prete (brancher Discord-Slack ici)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {}
+}

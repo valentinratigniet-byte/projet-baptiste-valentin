@@ -81,6 +81,11 @@ services:
       N8N_PORT: 5678
       TZ: Europe/Paris
       N8N_SECURE_COOKIE: "false"
+      # Node.js a son propre magasin de certificats, distinct du magasin
+      # OS - update-ca-certificates (scripts/fix-local-ssl.ps1) ne suffit
+      # pas pour lui. Fichier absent par defaut = juste un warning Node,
+      # pas un crash (voir docs/DETTE-TECHNIQUE.md).
+      NODE_EXTRA_CA_CERTS: /usr/local/share/ca-certificates/local-intercept-root.crt
     ports:
       - "5678:5678"
     volumes:

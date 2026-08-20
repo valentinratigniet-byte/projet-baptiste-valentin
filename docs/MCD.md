@@ -22,7 +22,7 @@ DIM_DATE(date_id PK, date, mois, trimestre, annee, ...)
 DIM_CENTRE_COUT(centre_cout_id PK, code, libelle, responsable, centre_parent_id FK)
 DIM_COMPTE(compte_id PK, code_compte, libelle, nature)         -- nature = charge/produit
 DIM_PRODUIT(produit_id PK, code, libelle, famille)
-DIM_CLIENT(client_id PK, code, libelle, segment)
+DIM_CLIENT(client_id PK, code, libelle, segment, siret)
 DIM_VERSION_BUDGET(version_id PK, libelle, date_validation)     -- ex: "Budget initial 2026", "Forecast T2"
 
 FACT_VENTES_REEL(

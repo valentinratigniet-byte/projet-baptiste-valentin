@@ -47,6 +47,9 @@ certutil -encode $crtPath $pemPath | Out-Null
 
 foreach ($c in $Containers) {
     docker cp $pemPath "${c}:/usr/local/share/ca-certificates/local-intercept-root.crt"
-    docker exec $c update-ca-certificates
+    # -u root : certains conteneurs (n8n) tournent par defaut sous un user
+    # non-root qui ne peut pas ecrire /etc/ssl/certs (trouve en cablant
+    # n8n sur des APIs externes au Sprint 5).
+    docker exec -u root $c update-ca-certificates
     Write-Output "CA installee dans $c - penser a `docker restart $c` pour qu'il recharge son pool de certificats."
 }

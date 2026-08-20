@@ -81,12 +81,25 @@ seulement de la génération de données propres.
   aléatoire de `main()`). Dette #1/#2 (Sprint 3) définitivement soldées ;
   #5/#6 (SIRET) reportées à Sprint 5, faute de temps ce sprint-ci.
 
-## Sprint 5 — Hub n8n
+## Sprint 5 — Hub n8n ✅ terminé
 - Reverse ETL : génération de la liasse de clôture mensuelle (Excel) → dépôt Drive
 - Alerting dépassement budgétaire (Discord/Slack/Email) déclenché depuis Gold, jamais depuis la source
 - Veille stratégique : collecte APIs (Finance/Bourse/IA/Pilotage d'entreprise) → résumé Ollama → distribution
 - Workflows exportés en JSON versionné dans `n8n/workflows/` + script d'import (dette #3)
 - Notification n8n des changements de schéma dbt (webhook déclenché en CI)
+
+  → tout réalisé, détail complet dans `docs/N8N.md` : 5 workflows testés
+  (y compris après réimport complet sur instance vierge). `cloture-mensuelle`
+  dépose un vrai XLSX (Postgres → Spreadsheet File → MinIO) ;
+  `alerting-depassement-budgetaire` détecte 20 lignes à >20% d'écart et les
+  formate ; `veille-strategique` collecte Hacker News + taux de change,
+  résume via Ollama (`llama3.2:1b`) et dépose le résultat — qualité de
+  résumé limitée par la taille du modèle, assumé. Discord/Slack/Drive
+  laissés en placeholder explicite (pas de compte externe disponible,
+  dettes #6/#7). Dette #5/#6 (SIRET, reportée du Sprint 4) réglée : ajout
+  du champ SIRET, précision de réconciliation 54% → **80,2%** (F1 89,0%).
+  Root cause SSL round 2 trouvée : Node.js (n8n) ignore le magasin de
+  certificats OS, fixé via `NODE_EXTRA_CA_CERTS`.
 
 ## Sprint 6 — Gouvernance avancée & FinOps
 - Row-Level Security (RLS) sur BigQuery, par profil (RH/Finance/Direction/PDG)

@@ -1,0 +1,160 @@
+{
+  "name": "Veille strategique",
+  "nodes": [
+    {
+      "id": "trig1",
+      "name": "Declenchement",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        180,
+        300
+      ],
+      "webhookId": "a1b2c3d4-e5f6-4a3b-8c9d-0e1f2a3b4c5d",
+      "parameters": {
+        "path": "trigger-veille",
+        "httpMethod": "POST",
+        "responseMode": "onReceived",
+        "options": {}
+      }
+    },
+    {
+      "id": "http1",
+      "name": "Actualites tech-IA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        420,
+        220
+      ],
+      "parameters": {
+        "url": "https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=5",
+        "options": {}
+      }
+    },
+    {
+      "id": "http2",
+      "name": "Taux de change",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        420,
+        380
+      ],
+      "parameters": {
+        "url": "https://api.frankfurter.dev/v1/latest?from=EUR&to=USD,GBP,CHF",
+        "options": {}
+      }
+    },
+    {
+      "id": "code1",
+      "name": "Construire le digest brut",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const news = $('Actualites tech-IA').first().json.hits.map(h => '- ' + h.title).join('\\n');\nconst fx = $('Taux de change').first().json.rates;\nconst fxLine = Object.entries(fx).map(([k,v]) => k + '=' + v).join(', ');\nconst digest = 'Actualites tech/IA (Hacker News) :\\n' + news + '\\n\\nTaux de change EUR -> ' + fxLine;\nreturn [{ json: { digest_brut: digest } }];"
+      }
+    },
+    {
+      "id": "http3",
+      "name": "Resumer via Ollama",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1100,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/generate",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama3.2:1b', stream: false, prompt: 'Resume en francais, en 3 phrases maximum, la veille suivante pour un dirigeant d\\'entreprise :\\n\\n' + $json.digest_brut }) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "s3upload1",
+      "name": "Distribuer (MinIO, brancher email-Discord ici)",
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        300
+      ],
+      "parameters": {
+        "resource": "file",
+        "operation": "upload",
+        "bucketName": "veille",
+        "binaryData": false,
+        "fileContent": "={{ $json.response }}",
+        "fileName": "={{ 'resume_' + $now.toFormat('yyyy-MM-dd_HHmm') + '.txt' }}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "s3": {
+          "id": "3lHrDYdCa6box7ra",
+          "name": "MinIO Bronze"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Declenchement": {
+      "main": [
+        [
+          {
+            "node": "Actualites tech-IA",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Taux de change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualites tech-IA": {
+      "main": [
+        [
+          {
+            "node": "Construire le digest brut",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construire le digest brut": {
+      "main": [
+        [
+          {
+            "node": "Resumer via Ollama",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resumer via Ollama": {
+      "main": [
+        [
+          {
+            "node": "Distribuer (MinIO, brancher email-Discord ici)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {}
+}

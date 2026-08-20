@@ -79,9 +79,12 @@ def gen_dim_produit():
 
 
 def gen_dim_client():
+    """dette #5 (SIRET) : identifiant métier stable pour désambiguïser les
+    homonymes lors de la réconciliation ERP legacy (docs/REFONTE-ERP.md)."""
     segments = ["Grand compte", "PME", "Particulier", "Revendeur"]
     rows = [{"client_id": i, "code": f"CLI{i:05d}", "libelle": fake.company(),
-             "segment": random.choice(segments)} for i in range(1, N_CLIENTS + 1)]
+             "segment": random.choice(segments), "siret": fake.siret().replace(" ", "")}
+            for i in range(1, N_CLIENTS + 1)]
     return pd.DataFrame(rows)
 
 
@@ -191,15 +194,17 @@ def load_to_mysql(dim_produit, dim_client, fact_ventes_reel):
     cur = conn.cursor()
     cur.execute("""CREATE TABLE IF NOT EXISTS dim_produit (
         produit_id INT PRIMARY KEY, code VARCHAR(20), libelle VARCHAR(200), famille VARCHAR(50))""")
-    cur.execute("""CREATE TABLE IF NOT EXISTS dim_client (
-        client_id INT PRIMARY KEY, code VARCHAR(20), libelle VARCHAR(200), segment VARCHAR(50))""")
+    cur.execute("DROP TABLE IF EXISTS dim_client")  # schema evolue (ajout siret, Sprint 5)
+    cur.execute("""CREATE TABLE dim_client (
+        client_id INT PRIMARY KEY, code VARCHAR(20), libelle VARCHAR(200), segment VARCHAR(50),
+        siret VARCHAR(14))""")
     cur.execute("""CREATE TABLE IF NOT EXISTS fact_ventes_reel (
         vente_id INT PRIMARY KEY, date DATE, centre_cout_id INT, compte_id INT,
         produit_id INT, client_id INT, montant_reel DECIMAL(12,2), quantite INT)""")
 
     for table, df, cols in [
         ("dim_produit", dim_produit, ["produit_id", "code", "libelle", "famille"]),
-        ("dim_client", dim_client, ["client_id", "code", "libelle", "segment"]),
+        ("dim_client", dim_client, ["client_id", "code", "libelle", "segment", "siret"]),
         ("fact_ventes_reel", fact_ventes_reel,
          ["vente_id", "date", "centre_cout_id", "compte_id", "produit_id",
           "client_id", "montant_reel", "quantite"]),

@@ -11,6 +11,7 @@ with crm as (
         code,
         libelle,
         segment,
+        siret,
         'CRM' as source
     from {{ ref('stg_crm__dim_client') }}
 ),
@@ -30,6 +31,7 @@ legacy_golden as (
         cdcli as code,
         rscli as libelle,
         cast(null as varchar) as segment,
+        cast(null as varchar) as siret,
         'ERP_LEGACY_ONLY' as source
     from legacy_non_reconcilies
 )

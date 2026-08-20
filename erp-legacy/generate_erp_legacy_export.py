@@ -67,27 +67,34 @@ def get_clients_crm():
         database="crm",
     )
     cur = conn.cursor()
-    cur.execute("SELECT client_id, libelle FROM dim_client")
+    cur.execute("SELECT client_id, libelle, siret FROM dim_client")
     rows = cur.fetchall()
     cur.close()
     conn.close()
     return rows
 
 
+SIRET_MANQUANT_TAUX = 0.20  # dette #5 : la moitie de la migration ERP n'a jamais saisi le SIRET
+
+
 def build_legacy_clients(clients_crm):
     """Construit le référentiel client legacy :
     - ~80 clients CRM avec 1 ou 2 variantes de saisie (le vrai problème MDM)
     - ~25 clients legacy-only (jamais repris dans le CRM)
-    Retourne une liste de dicts {cdcli, rscli, client_crm_id (ou None)}."""
+    - SIRET repris du CRM dans ~80% des cas (dette #5 : le reste est manquant,
+      typique d'une saisie legacy incomplète -> pas de désambiguïsation
+      magique à 100%, juste une réduction du problème)
+    Retourne une liste de dicts {cdcli, rscli, siret, client_crm_id (ou None)}."""
     legacy = []
     code = 1
     sample = random.sample(clients_crm, k=min(80, len(clients_crm)))
-    for client_id, libelle in sample:
+    for client_id, libelle, siret in sample:
         n_variantes = random.choices([1, 2], weights=[70, 30])[0]
         for _ in range(n_variantes):
             legacy.append({
                 "cdcli": f"{code:05d}" if random.random() < 0.6 else f"CLI{code}",
                 "rscli": deform_name(libelle),
+                "siret": "" if random.random() < SIRET_MANQUANT_TAUX else siret,
                 "client_crm_id": client_id,
             })
             code += 1
@@ -95,6 +102,7 @@ def build_legacy_clients(clients_crm):
         legacy.append({
             "cdcli": f"{code:05d}",
             "rscli": fake.company(),
+            "siret": fake.siret().replace(" ", ""),
             "client_crm_id": None,  # client legacy jamais migré vers le CRM
         })
         code += 1
@@ -159,7 +167,7 @@ def main():
     # Référentiel client legacy, pour la réconciliation (Sprint 2)
     ref_path = os.path.join(OUTPUT_DIR, "REF_CLIENT_LEGACY.csv")
     with open(ref_path, "w", newline="", encoding="latin-1") as f:
-        writer = csv.DictWriter(f, fieldnames=["cdcli", "rscli", "client_crm_id"], delimiter=";")
+        writer = csv.DictWriter(f, fieldnames=["cdcli", "rscli", "siret", "client_crm_id"], delimiter=";")
         writer.writeheader()
         writer.writerows(legacy_clients)
     print(f"  référentiel client -> {ref_path}")
