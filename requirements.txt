@@ -1,0 +1,11 @@
+dnspython==2.8.0
+Faker==40.36.0
+mysql-connector-python==26.7.0
+numpy==2.5.2
+pandas==3.0.5
+pip_system_certs==5.3
+pymongo==4.17.0
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.3
+six==1.17.0
+tzdata==2026.3

@@ -1,0 +1,9 @@
+.env
+secrets/
+*.pyc
+__pycache__/
+.venv/
+dbt_packages/
+logs/
+*.log
+data-generation/output/
