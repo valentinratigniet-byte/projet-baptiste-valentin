@@ -101,13 +101,29 @@ seulement de la génération de données propres.
   Root cause SSL round 2 trouvée : Node.js (n8n) ignore le magasin de
   certificats OS, fixé via `NODE_EXTRA_CA_CERTS`.
 
-## Sprint 6 — Gouvernance avancée & FinOps
+## Sprint 6 — Gouvernance avancée & FinOps ✅ terminé
 - Row-Level Security (RLS) sur BigQuery, par profil (RH/Finance/Direction/PDG)
 - Column-Level Security / Dynamic Masking via Policy Tags (données sensibles : salaires, marges)
 - Partitionnement et règles de rétention (FinOps, contrôle des coûts BigQuery)
 - CI/CD GitHub Actions : `dbt docs` → GitHub Pages à chaque merge
 - Pipeline CI complet (lint + self-checks générateurs + `dbt build` dev) — solde la dette #4
 - Checklist rotation des secrets avant toute exposition réseau (dette #5)
+
+  → tout réalisé, détail complet dans `docs/GOUVERNANCE.md`. **Vrai projet
+  GCP dédié** `bv-dataplatform` (facturation liée, distinct du portfolio
+  solo), pas une simulation. RLS + Policy Tags appliqués sur
+  `fct_ecarts_reel_budget` (partitionnée par mois, rétention 730j) et
+  **prouvés par requête réelle** avec 4 comptes de service : RH voit 0
+  ligne et se fait refuser la colonne `montant_reel` (deux mécanismes
+  indépendants), Finance/Direction/PDG voient les 2 240 lignes et
+  11 847 943,82€. CI GitHub Actions vert du premier coup sur le pipeline
+  complet ; `dbt docs` publié sur GitHub Pages
+  (https://valentinratigniet-byte.github.io/projet-baptiste-valentin/).
+  Trois root causes trouvées et corrigées en cours de route : collision
+  `GOOGLE_APPLICATION_CREDENTIALS` avec le portfolio solo (renommé
+  `BQ_KEYFILE`), troisième piège SSL (gRPC, indépendant de Python/Node —
+  `GRPC_CA_BUNDLE`), convention de région Data Catalog (`eu` minuscule vs
+  `EU` BigQuery).
 
 ## Sprint 7 — MLOps
 - Forecasting métier (Python, séries temporelles sur `fct_ecarts_reel_budget`)

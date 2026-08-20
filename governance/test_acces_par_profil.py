@@ -17,6 +17,8 @@ from google.cloud import bigquery, datacatalog_v1
 from google.oauth2 import service_account
 
 load_dotenv()
+if os.getenv("GRPC_CA_BUNDLE"):
+    os.environ.setdefault("GRPC_DEFAULT_SSL_ROOTS_FILE_PATH", os.environ["GRPC_CA_BUNDLE"])
 
 BQ_PROJECT = os.getenv("BQ_PROJECT", "bv-dataplatform")
 KEYS_DIR = os.path.join(os.path.expanduser("~"), ".gcp", "bv-viewers")

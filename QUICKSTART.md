@@ -1,8 +1,13 @@
 # Démarrage rapide
 
 Roadmap simple pour faire tourner le projet tel qu'il existe aujourd'hui
-(Sprints 1 à 5 terminés). Pour le plan de développement complet, voir
+(Sprints 1 à 6 terminés). Pour le plan de développement complet, voir
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
+Les étapes 1 à 11 ci-dessous tournent 100% en local (Docker), sans compte
+cloud. La partie BigQuery (Sprint 6, RLS/Policy Tags) est **optionnelle**
+et nécessite un vrai projet GCP avec facturation — voir
+[`docs/GOUVERNANCE.md`](docs/GOUVERNANCE.md) si tu veux la reproduire.
 
 ## Prérequis
 

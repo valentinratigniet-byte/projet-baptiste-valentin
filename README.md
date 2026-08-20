@@ -13,6 +13,9 @@ et du DataOps d'une entreprise multi-millions d'euros, stack 100% gratuite.
 - [`docs/DATA-CONTRACTS.md`](docs/DATA-CONTRACTS.md) — contrats JSON Schema, DLQ et classification RGPD
 - [`docs/DBT.md`](docs/DBT.md) — entrepôt dbt : couches, MDM, écarts Réel/Budget, allocations, tests
 - [`docs/N8N.md`](docs/N8N.md) — les 5 workflows, réconciliation SIRET, piège SSL Node.js
+- [`docs/GOUVERNANCE.md`](docs/GOUVERNANCE.md) — RLS + Policy Tags BigQuery, prouvés par requête réelle
+- [`docs/SECRETS-CHECKLIST.md`](docs/SECRETS-CHECKLIST.md) — rotation des secrets avant exposition réseau
+- **Doc dbt en ligne** : https://valentinratigniet-byte.github.io/projet-baptiste-valentin/
 
 ## Démarrer l'infra locale
 
@@ -130,3 +133,26 @@ cd dbt_cg && DBT_PROFILES_DIR=. ../.venv/Scripts/dbt.exe build
 21 modèles (staging + marts), 68 tests dbt. Écarts Réel/Budget, MDM golden
 record client, allocations analytiques : détail et chiffres réels dans
 [`docs/DBT.md`](docs/DBT.md).
+
+## Gouvernance BigQuery (RLS + masking)
+
+```bash
+./.venv/Scripts/python.exe governance/sync_marts_to_bigquery.py
+./.venv/Scripts/python.exe governance/apply_rls_and_masking.py
+./.venv/Scripts/python.exe governance/test_acces_par_profil.py
+```
+
+Projet GCP dédié `bv-dataplatform`. Row-Level Security + Policy Tags sur
+`fct_ecarts_reel_budget`, prouvés par requête réelle avec 4 comptes de
+service (RH/Finance/Direction/PDG) — RH voit 0 ligne et se fait refuser la
+colonne sensible, les 3 autres voient tout. Détail complet, chiffres réels,
+3 root causes trouvées en route (dont un 3ᵉ piège SSL, côté gRPC) :
+[`docs/GOUVERNANCE.md`](docs/GOUVERNANCE.md).
+
+## CI/CD
+
+- **CI** (`.github/workflows/ci.yml`) : pipeline complet (générateurs,
+  self-checks, data contracts, migration ERP, `dbt build`) à chaque push,
+  sur services MySQL/Mongo/MinIO/Postgres éphémères.
+- **dbt docs** (`.github/workflows/dbt-docs.yml`) : publié sur GitHub Pages
+  à chaque changement dans `dbt_cg/`.

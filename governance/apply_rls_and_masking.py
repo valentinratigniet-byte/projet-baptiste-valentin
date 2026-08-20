@@ -18,6 +18,10 @@ from google.cloud import bigquery, datacatalog_v1
 from google.oauth2 import service_account
 
 load_dotenv()
+if os.getenv("GRPC_CA_BUNDLE"):
+    # gRPC (client Data Catalog) a sa propre pile SSL, indépendante de
+    # pip-system-certs - doit être positionné avant toute création de canal.
+    os.environ.setdefault("GRPC_DEFAULT_SSL_ROOTS_FILE_PATH", os.environ["GRPC_CA_BUNDLE"])
 
 BQ_PROJECT = os.getenv("BQ_PROJECT", "bv-dataplatform")
 # Data Catalog veut la region en minuscules ("eu"), contrairement a la
