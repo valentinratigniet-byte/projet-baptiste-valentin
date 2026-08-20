@@ -92,9 +92,12 @@ def gen_dim_version_budget():
     ])
 
 
+VENTES_CENTRES_LIBELLES = ["Ventes", "Direction régionale Nord", "Direction régionale Sud"]
+
+
 def gen_fact_ventes_reel(dim_produit, dim_client, dim_centre_cout, dim_compte):
     ventes_centres = dim_centre_cout[dim_centre_cout["libelle"].isin(
-        ["Ventes", "Direction régionale Nord", "Direction régionale Sud"])]["centre_cout_id"].tolist()
+        VENTES_CENTRES_LIBELLES)]["centre_cout_id"].tolist()
     compte_ventes_id = int(dim_compte[dim_compte["libelle"] == "Ventes produits"]["compte_id"].iloc[0])
     rows = []
     vid = 1
@@ -117,13 +120,24 @@ def gen_fact_ventes_reel(dim_produit, dim_client, dim_centre_cout, dim_compte):
 
 
 def gen_fact_budget(dim_centre_cout, dim_compte):
+    """Budgète les charges (comme avant) ET le chiffre d'affaires des
+    centres commerciaux (compte "Ventes produits") — sans ça, fct_ventes_reel
+    (100% revenu) et fact_budget (100% charges à l'origine) ne partageaient
+    jamais le même compte, rendant tout calcul d'écart Réel/Budget vide par
+    construction. Root cause corrigée ici plutôt que contournée en aval."""
     charge_comptes = dim_compte[dim_compte["nature"] == "charge"]["compte_id"].tolist()
+    compte_ventes_id = int(dim_compte[dim_compte["libelle"] == "Ventes produits"]["compte_id"].iloc[0])
+    ventes_centres_ids = set(dim_centre_cout[dim_centre_cout["libelle"].isin(
+        VENTES_CENTRES_LIBELLES)]["centre_cout_id"].tolist())
+
     rows = []
     bid = 1
     for _, centre in dim_centre_cout.iterrows():
         comptes_du_centre = random.sample(charge_comptes, k=min(6, len(charge_comptes)))
-        for compte_id in comptes_du_centre:
-            base = round(random.uniform(2000, 40000), 2)
+        bases = {compte_id: round(random.uniform(2000, 40000), 2) for compte_id in comptes_du_centre}
+        if centre["centre_cout_id"] in ventes_centres_ids:
+            bases[compte_ventes_id] = round(random.uniform(120000, 220000), 2)
+        for compte_id, base in bases.items():
             for periode in MOIS_BUDGET:
                 version_id = 1 if periode.year == 2025 else 2
                 saisonnalite = 1 + 0.1 * (periode.month % 4 - 1.5) / 1.5
@@ -202,6 +216,8 @@ def load_to_mysql(dim_produit, dim_client, fact_ventes_reel):
 
 
 def main():
+    random.seed(42)
+    Faker.seed(42)
     print("Génération des dimensions...")
     dim_centre_cout = gen_dim_centre_cout()
     dim_compte = gen_dim_compte()
@@ -236,7 +252,13 @@ def demo():
     """Self-check minimal (dette technique #2) : rejoue la génération pure
     (pas de DB/IO) et vérifie les invariants de base. `assert` volontaire :
     doit planter bruyamment si un futur refactor casse une borne d'ID ou une
-    jointure, comme l'a fait silencieusement le bug d'ID de compte hardcodé."""
+    jointure, comme l'a fait silencieusement le bug d'ID de compte hardcodé.
+
+    Re-seed en entrée : demo() consomme des tirages aléatoires, donc sans
+    ça main() ne regénèrerait plus les mêmes données selon qu'il est appelé
+    seul ou après demo() (bug réel rencontré en développant ce self-check)."""
+    random.seed(42)
+    Faker.seed(42)
     dim_centre_cout = gen_dim_centre_cout()
     dim_compte = gen_dim_compte()
     dim_produit = gen_dim_produit()
@@ -257,6 +279,8 @@ def demo():
     assert fact_budget["centre_cout_id"].isin(dim_centre_cout["centre_cout_id"]).all()
     assert fact_forecast["montant_forecast"].min() > 0
     assert not fact_ventes_reel.isnull().any().any()
+    comptes_communs = set(fact_ventes_reel["compte_id"]) & set(fact_budget["compte_id"])
+    assert comptes_communs, "Réel et Budget doivent partager au moins un compte (sinon écart toujours vide)"
     print("demo(): OK -", len(fact_ventes_reel), "ventes,", len(fact_budget),
           "budget,", len(fact_forecast), "forecast, tous invariants respectés")
 

@@ -1,0 +1,24 @@
+dbt_cg:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: 127.0.0.1
+      port: 5434
+      user: "{{ env_var('POSTGRES_USER', 'dbt_user') }}"
+      pass: "{{ env_var('POSTGRES_PASSWORD', 'changeme') }}"
+      dbname: "{{ env_var('POSTGRES_DB', 'dbt_dev') }}"
+      schema: public
+      threads: 4
+
+    # Cible prod (docs/ARCHITECTURE.md). Nécessite `pip install dbt-bigquery`
+    # (pas installé tant que le projet GCP n'existe pas - YAGNI) et un vrai
+    # projet BigQuery + compte de service (BQ_PROJECT/BQ_DATASET/
+    # GOOGLE_APPLICATION_CREDENTIALS dans .env). Pas fonctionnel avant ça.
+    prod:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('BQ_PROJECT', '') }}"
+      dataset: "{{ env_var('BQ_DATASET', '') }}"
+      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS', '') }}"
+      threads: 4

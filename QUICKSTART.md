@@ -1,13 +1,20 @@
 # Démarrage rapide
 
 Roadmap simple pour faire tourner le projet tel qu'il existe aujourd'hui
-(Sprints 1 à 3 terminés). Pour le plan de développement complet, voir
+(Sprints 1 à 4 terminés). Pour le plan de développement complet, voir
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Prérequis
 
 - Docker Desktop installé et lancé
 - Python 3.12 (`python --version`)
+
+## Ordre important
+
+Les étapes 6 à 8 doivent s'exécuter **dans cet ordre exact** : chacune lit
+ce que la précédente a écrit (générateurs → data contracts/Bronze →
+migration ERP → chargement `raw` → dbt). Changer l'ordre fait planter une
+étape sur des données manquantes.
 
 ## Étapes
 
@@ -42,29 +49,37 @@ Roadmap simple pour faire tourner le projet tel qu'il existe aujourd'hui
    ```
    Si `pip install` échoue avec une erreur SSL : `./.venv/Scripts/python.exe -m pip install pip-system-certs` puis relancer.
 
-6. **Générer et charger les données**
+6. **Générer les données sources**
    ```bash
    ./.venv/Scripts/python.exe data-generation/generate_cg_data.py
    ./.venv/Scripts/python.exe data-generation/generate_logs_mongo.py
    ./.venv/Scripts/python.exe erp-legacy/generate_erp_legacy_export.py
-   ./.venv/Scripts/python.exe erp-legacy/migrate_erp_to_target.py
    ```
 
-7. **Valider et faire passer en Bronze** (contrats JSON Schema + RGPD + DLQ)
+7. **Valider (contrats JSON Schema + RGPD), migrer l'ERP, charger l'entrepôt**
    ```bash
-   ./.venv/Scripts/python.exe data-contracts/ingest_to_bronze.py
+   ./.venv/Scripts/python.exe data-contracts/ingest_to_bronze.py      # Bronze + DLQ
+   ./.venv/Scripts/python.exe erp-legacy/migrate_erp_to_target.py     # lit Bronze -> erp_migre
+   ./.venv/Scripts/python.exe data-contracts/load_bronze_to_raw.py    # Bronze -> Postgres (raw)
    ```
 
-8. **Vérifier que ça tourne**
+8. **Construire l'entrepôt dbt**
+   ```bash
+   cd dbt_cg && DBT_PROFILES_DIR=. ../.venv/Scripts/dbt.exe build
+   ```
+   68 tests doivent passer. Les marts (`fct_ecarts_reel_budget`, `dim_client`
+   golden record, etc.) sont dans le schéma `public_marts` de Postgres.
+
+9. **Vérifier que ça tourne**
    - MinIO console : http://localhost:9001 (buckets `bronze`/`rejects`)
    - n8n : http://localhost:5678 (identifiants dans `.env`)
    - Ollama : `curl http://localhost:11434/api/tags`
-   - MySQL : `docker exec bv-mysql-crm mysql -u crm_user -p<mot de passe> crm -e "SELECT COUNT(*) FROM fact_ventes_reel;"`
+   - Postgres : `docker exec bv-postgres-dbtdev psql -U dbt_user -d dbt_dev -c "SELECT * FROM public_marts.fct_allocation_couts;"`
 
-9. **Tout arrêter** (les données restent dans les volumes Docker)
-   ```bash
-   docker compose down
-   ```
+10. **Tout arrêter** (les données restent dans les volumes Docker)
+    ```bash
+    docker compose down
+    ```
 
 ## En cas de blocage
 

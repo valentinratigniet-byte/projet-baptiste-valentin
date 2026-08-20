@@ -1,0 +1,77 @@
+version: 2
+
+models:
+  - name: stg_crm__dim_client
+    columns:
+      - name: client_id
+        tests: [not_null, unique]
+      - name: segment
+        tests:
+          - accepted_values:
+              values: ["Grand compte", "PME", "Particulier", "Revendeur"]
+
+  - name: stg_crm__dim_produit
+    columns:
+      - name: produit_id
+        tests: [not_null, unique]
+
+  - name: stg_crm__fact_ventes_reel
+    columns:
+      - name: vente_id
+        tests: [not_null, unique]
+      - name: client_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_crm__dim_client')
+              field: client_id
+      - name: produit_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_crm__dim_produit')
+              field: produit_id
+
+  - name: stg_finance__dim_centre_cout
+    columns:
+      - name: centre_cout_id
+        tests: [not_null, unique]
+
+  - name: stg_finance__dim_compte
+    columns:
+      - name: compte_id
+        tests: [not_null, unique]
+      - name: nature
+        tests:
+          - accepted_values:
+              values: ["charge", "produit"]
+
+  - name: stg_finance__fact_budget
+    columns:
+      - name: budget_id
+        tests: [not_null, unique]
+      - name: centre_cout_id
+        tests:
+          - relationships:
+              to: ref('stg_finance__dim_centre_cout')
+              field: centre_cout_id
+      - name: compte_id
+        tests:
+          - relationships:
+              to: ref('stg_finance__dim_compte')
+              field: compte_id
+
+  - name: stg_finance__fact_forecast
+    columns:
+      - name: forecast_id
+        tests: [not_null, unique]
+
+  - name: stg_erp__fact_ventes_migre
+    columns:
+      - name: numpce
+        tests: [not_null, unique]
+      - name: client_crm_id_propose
+        tests:
+          - relationships:
+              to: ref('stg_crm__dim_client')
+              field: client_id

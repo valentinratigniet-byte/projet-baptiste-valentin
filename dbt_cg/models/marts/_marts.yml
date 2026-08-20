@@ -1,0 +1,64 @@
+version: 2
+
+models:
+  - name: dim_date
+    columns:
+      - name: date
+        tests: [not_null, unique]
+
+  - name: dim_client
+    columns:
+      - name: client_id
+        tests: [not_null, unique]
+      - name: source
+        tests:
+          - accepted_values:
+              values: ["CRM", "ERP_LEGACY_ONLY"]
+
+  - name: dim_produit
+    columns:
+      - name: produit_id
+        tests: [not_null, unique]
+
+  - name: dim_centre_cout
+    columns:
+      - name: centre_cout_id
+        tests: [not_null, unique]
+
+  - name: dim_compte
+    columns:
+      - name: compte_id
+        tests: [not_null, unique]
+
+  - name: fct_ventes_reel
+    columns:
+      - name: id_ligne
+        tests: [not_null, unique]
+      - name: centre_cout_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_centre_cout')
+              field: centre_cout_id
+      - name: compte_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_compte')
+              field: compte_id
+      - name: source
+        tests:
+          - accepted_values:
+              values: ["CRM", "ERP_LEGACY"]
+
+  - name: fct_ecarts_reel_budget
+    columns:
+      - name: periode
+        tests: [not_null]
+
+  - name: fct_allocation_couts
+    columns:
+      - name: centre_cout_id
+        tests: [not_null, unique]
+      - name: cle_repartition
+        tests: [not_null]

@@ -4,6 +4,8 @@ secrets/
 __pycache__/
 .venv/
 dbt_packages/
+target/
+.user.yml
 logs/
 *.log
 data-generation/output/

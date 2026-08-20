@@ -1,14 +1,21 @@
 """Migration Sprint 2 : ERP legacy -> cible.
 
-Lit l'export legacy brut (erp-legacy/exports/), le nettoie, réconcilie les
-clients dupliqués/mal orthographiés par fuzzy matching contre le CRM (comme
-le Projet 12 du portfolio solo : rapidfuzz + évaluation précision/rappel
-contre une vérité terrain), mappe les centres de coût via une table de
+Lit le flux ERP validé (MinIO `bronze/erp_legacy/vente_ligne_brute/`, Sprint
+3 - le data contract a déjà écarté les 51 lignes à date invalide en DLQ,
+donc plus besoin de les re-détecter ici), réconcilie les clients
+dupliqués/mal orthographiés par fuzzy matching contre le CRM (comme le
+Projet 12 du portfolio solo : rapidfuzz + évaluation précision/rappel contre
+une vérité terrain), mappe les centres de coût via une table de
 correspondance explicite, et charge le résultat dans Postgres
-(`erp_migre`, cible dbt-dev) avec un flag qualité par ligne — préfigure les
-data contracts du Sprint 3.
+(`erp_migre`, cible dbt-dev) avec un flag qualité par ligne.
+
+Le référentiel client (REF_CLIENT_LEGACY.csv) reste lu depuis
+erp-legacy/exports/ : ce n'est pas un flux de données métier, c'est la
+"vérité terrain" du générateur, utilisée uniquement pour évaluer le
+matching (elle n'existerait pas dans une vraie migration).
 
 Usage : .venv/Scripts/python.exe erp-legacy/migrate_erp_to_target.py
+(nécessite d'avoir lancé data-contracts/ingest_to_bronze.py avant)
 """
 import csv
 import os
@@ -18,12 +25,39 @@ from datetime import datetime
 import mysql.connector
 import psycopg2
 from dotenv import load_dotenv
+from minio import Minio
 from rapidfuzz import fuzz, process
 
 load_dotenv()
 
 EXPORT_DIR = os.path.join(os.path.dirname(__file__), "exports")
 SEUIL_MATCH = 85  # score rapidfuzz minimum pour accepter un rapprochement
+
+
+def get_minio_client():
+    return Minio("localhost:9000",
+                  access_key=os.getenv("MINIO_ROOT_USER", "minio_admin"),
+                  secret_key=os.getenv("MINIO_ROOT_PASSWORD", "changeme123"),
+                  secure=False)
+
+
+def read_bronze_erp_lignes():
+    """Lit le dernier run du flux ERP dans bronze/ (JSONL, déjà validé
+    structurellement par data-contracts/ingest_to_bronze.py)."""
+    import json
+    client = get_minio_client()
+    objects = list(client.list_objects("bronze", prefix="erp_legacy/vente_ligne_brute/", recursive=True))
+    if not objects:
+        raise RuntimeError("Aucune donnée dans bronze/erp_legacy/vente_ligne_brute/ "
+                            "- lancer data-contracts/ingest_to_bronze.py d'abord")
+    latest = max(objects, key=lambda o: o.last_modified).object_name
+    resp = client.get_object("bronze", latest)
+    try:
+        text = resp.read().decode("utf-8")
+    finally:
+        resp.close()
+        resp.release_conn()
+    return [json.loads(line) for line in text.splitlines() if line]
 
 # Table de correspondance centre de coût : construite à la main en lisant
 # l'export (dette #du diagnostic) -> exactement le genre de livrable qu'une
@@ -80,6 +114,7 @@ def reconcile_clients(clients_crm):
             resultats[row["cdcli"]] = (propose_id, score)
             verite_terrain.append((
                 row["cdcli"],
+                row["rscli"],
                 int(row["client_crm_id"]) if row["client_crm_id"] else None,
                 propose_id,
             ))
@@ -87,10 +122,10 @@ def reconcile_clients(clients_crm):
 
 
 def evaluer_matching(verite_terrain):
-    vp = sum(1 for _, vrai, propose in verite_terrain if vrai is not None and vrai == propose)
-    fp = sum(1 for _, vrai, propose in verite_terrain
+    vp = sum(1 for _, _, vrai, propose in verite_terrain if vrai is not None and vrai == propose)
+    fp = sum(1 for _, _, vrai, propose in verite_terrain
              if propose is not None and vrai != propose)
-    fn = sum(1 for _, vrai, propose in verite_terrain if vrai is not None and propose is None)
+    fn = sum(1 for _, _, vrai, propose in verite_terrain if vrai is not None and propose is None)
     precision = vp / (vp + fp) if (vp + fp) else 0
     rappel = vp / (vp + fn) if (vp + fn) else 0
     f1 = 2 * precision * rappel / (precision + rappel) if (precision + rappel) else 0
@@ -113,31 +148,32 @@ def parse_date(s):
 
 
 def clean_lignes(reconciliation):
+    """Le data contract (Sprint 3) a déjà écarté les dates invalides en
+    amont (bronze ne contient que des lignes structurellement valides) :
+    le seul motif de rejet métier qui reste ici est le centre de coût
+    non mappé."""
     lignes = []
-    with open(os.path.join(EXPORT_DIR, "ERP_EXPORT_VTE_2023_2024.csv"), encoding="latin-1") as f:
-        for row in csv.DictReader(f, delimiter=";"):
-            client_crm_id, score = reconciliation.get(row["CDCLI"], (None, 0))
-            date_piece = parse_date(row["DTPCE"])
-            centre = MAPPING_CDCC.get(row["CDCC"].strip())
-            motifs = []
-            if date_piece is None:
-                motifs.append("date_invalide")
-            if centre is None:
-                motifs.append("centre_cout_inconnu")
-            lignes.append({
-                "numpce": row["NUMPCE"],
-                "cdcli": row["CDCLI"],
-                "client_crm_id_propose": client_crm_id,
-                "score_matching": round(score, 1),
-                "centre_cout_libelle": centre,
-                "compte_code": row["CDCPT"],
-                "date_piece": date_piece,
-                "montant_ht": parse_montant(row["MTHT"]),
-                "montant_tva": parse_montant(row["MTTVA"]),
-                "montant_ttc": parse_montant(row["MTTTC"]),
-                "ligne_valide": len(motifs) == 0,
-                "motif_rejet": ",".join(motifs) or None,
-            })
+    for row in read_bronze_erp_lignes():
+        client_crm_id, score = reconciliation.get(row["CDCLI"], (None, 0))
+        date_piece = parse_date(row["DTPCE"])
+        centre = MAPPING_CDCC.get(row["CDCC"].strip())
+        motifs = []
+        if centre is None:
+            motifs.append("centre_cout_inconnu")
+        lignes.append({
+            "numpce": row["NUMPCE"],
+            "cdcli": row["CDCLI"],
+            "client_crm_id_propose": client_crm_id,
+            "score_matching": round(score, 1),
+            "centre_cout_libelle": centre,
+            "compte_code": row["CDCPT"],
+            "date_piece": date_piece,
+            "montant_ht": parse_montant(row["MTHT"]),
+            "montant_tva": parse_montant(row["MTTVA"]),
+            "montant_ttc": parse_montant(row["MTTTC"]),
+            "ligne_valide": len(motifs) == 0,
+            "motif_rejet": ",".join(motifs) or None,
+        })
     return lignes
 
 
@@ -150,8 +186,9 @@ def load_to_postgres(lignes, verite_terrain):
     )
     cur = conn.cursor()
     cur.execute("CREATE SCHEMA IF NOT EXISTS erp_migre")
-    cur.execute("""CREATE TABLE IF NOT EXISTS erp_migre.client_reconciliation (
-        cdcli VARCHAR(20) PRIMARY KEY, client_crm_id_verite INT,
+    cur.execute("DROP TABLE IF EXISTS erp_migre.client_reconciliation")  # schéma évolué (ajout rscli, Sprint 4)
+    cur.execute("""CREATE TABLE erp_migre.client_reconciliation (
+        cdcli VARCHAR(20) PRIMARY KEY, rscli VARCHAR(200), client_crm_id_verite INT,
         client_crm_id_propose INT)""")
     cur.execute("""CREATE TABLE IF NOT EXISTS erp_migre.fact_ventes_erp_migre (
         numpce VARCHAR(20) PRIMARY KEY, cdcli VARCHAR(20),
@@ -160,9 +197,9 @@ def load_to_postgres(lignes, verite_terrain):
         date_piece DATE, montant_ht NUMERIC, montant_tva NUMERIC,
         montant_ttc NUMERIC, ligne_valide BOOLEAN, motif_rejet VARCHAR(100))""")
 
-    cur.execute("TRUNCATE erp_migre.client_reconciliation, erp_migre.fact_ventes_erp_migre")
+    cur.execute("TRUNCATE erp_migre.fact_ventes_erp_migre")
     cur.executemany(
-        "INSERT INTO erp_migre.client_reconciliation VALUES (%s, %s, %s)",
+        "INSERT INTO erp_migre.client_reconciliation VALUES (%s, %s, %s, %s)",
         verite_terrain)
     cur.executemany(
         """INSERT INTO erp_migre.fact_ventes_erp_migre VALUES

@@ -59,13 +59,27 @@ seulement de la génération de données propres.
   dettes ouvertes (#7 pipeline sans self-check, #8 migration ERP non
   branchée sur Bronze), ciblées Sprint 4.
 
-## Sprint 4 — Entrepôt & Transformation
+## Sprint 4 — Entrepôt & Transformation ✅ terminé
 - dbt multi-target opérationnel (Postgres dev / BigQuery prod)
 - Modèles Silver : staging propre sur toutes les sources (CRM, ERP migré, Finance)
 - `fct_ecarts_reel_budget` : agrégation Réel au grain Budget, calcul écart et %
 - Allocations analytiques (répartition de charges indirectes entre centres de coûts)
 - Master Data Management : dédoublonnage/golden record sur les entités issues de la fusion CRM + ERP legacy
 - Tests dbt (not_null, unique, relationships, accepted_values) sur tous les modèles
+
+  → tout réalisé, détail complet dans `docs/DBT.md` : projet `dbt_cg/`
+  (cible dev Postgres fonctionnelle, cible prod BigQuery prête mais non
+  connectée — dette #8), nouveau loader `data-contracts/load_bronze_to_raw.py`
+  (Bronze → schéma `raw`), 21 modèles (10 staging + 11 marts), **68/68 tests
+  dbt PASS**. `fct_ecarts_reel_budget` fonctionne avec des écarts réels
+  (ex. +62% sur un centre en janvier) après correction d'une root cause
+  découverte en le construisant (Réel et Budget ne partageaient aucun
+  compte). `dim_client` golden record : 505 clients (500 CRM + 5 legacy-only
+  résolus). `fct_allocation_couts` livré avec un écart de périmètre assumé
+  et documenté (ventile du CA, pas des charges — dette #7). Un deuxième bug
+  de reproductibilité trouvé et corrigé au passage (`demo()` décalait l'état
+  aléatoire de `main()`). Dette #1/#2 (Sprint 3) définitivement soldées ;
+  #5/#6 (SIRET) reportées à Sprint 5, faute de temps ce sprint-ci.
 
 ## Sprint 5 — Hub n8n
 - Reverse ETL : génération de la liasse de clôture mensuelle (Excel) → dépôt Drive

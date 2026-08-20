@@ -1,0 +1,23 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Schema-on-read : chargé depuis Bronze/MinIO par data-contracts/load_bronze_to_raw.py"
+    schema: raw
+    tables:
+      - name: crm_dim_client
+      - name: crm_dim_produit
+      - name: crm_fact_ventes_reel
+      - name: logs_app_events
+      - name: finance_dim_centre_cout
+      - name: finance_dim_compte
+      - name: finance_dim_version_budget
+      - name: finance_fact_budget
+      - name: finance_fact_forecast
+
+  - name: erp_migre
+    description: "Chargé directement par erp-legacy/migrate_erp_to_target.py (Sprint 2), déjà typé"
+    schema: erp_migre
+    tables:
+      - name: fact_ventes_erp_migre
+      - name: client_reconciliation

@@ -70,6 +70,8 @@ def load_to_mongo(docs):
 
 
 def main():
+    random.seed(42)
+    Faker.seed(42)
     print("Génération des logs applicatifs...")
     docs = gen_logs()
     print(f"  {len(docs)} événements générés")
@@ -79,7 +81,11 @@ def main():
 
 
 def demo():
-    """Self-check minimal (dette technique #2)."""
+    """Self-check minimal (dette technique #2). Re-seed : voir le commentaire
+    équivalent dans generate_cg_data.py (demo() ne doit pas décaler la
+    séquence aléatoire de main())."""
+    random.seed(42)
+    Faker.seed(42)
     docs = gen_logs()
     assert len(docs) > 0
     assert all(1 <= d["client_id"] <= N_CLIENTS for d in docs)

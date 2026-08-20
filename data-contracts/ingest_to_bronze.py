@@ -184,5 +184,26 @@ def main():
     print(f"Total : {total_ok} acceptés -> bronze/, {total_ko} rejetés -> rejects/")
 
 
+def demo():
+    """Self-check minimal (dette technique #7) : vérifie qu'un flux propre
+    (dim_client) a 0 rejet et que le flux ERP a bien ~2% de rejets attendus
+    (dates invalides connues, cf. docs/REFONTE-ERP.md) — pas de dérive
+    silencieuse d'un contrat."""
+    for flow_name, reader, schema_file, anonymize in FLOWS:
+        if flow_name not in ("crm/dim_client", "erp_legacy/vente_ligne_brute"):
+            continue
+        records = reader()
+        if anonymize:
+            records = anonymize(records)
+        accepted, rejected = validate_records(records, schema_file)
+        if flow_name == "crm/dim_client":
+            assert len(rejected) == 0, f"dim_client devrait être 100% conforme, {len(rejected)} rejets"
+        if flow_name == "erp_legacy/vente_ligne_brute":
+            taux = len(rejected) / len(records)
+            assert 0.01 < taux < 0.03, f"taux de rejet ERP inattendu : {taux:.1%} (attendu ~2%)"
+    print("demo(): OK - dim_client 0 rejet, ERP legacy ~2% de rejets (dates invalides), invariants respectés")
+
+
 if __name__ == "__main__":
+    demo()
     main()

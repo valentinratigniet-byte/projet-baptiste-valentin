@@ -3,13 +3,15 @@
 Projet binôme Baptiste / Valentin. Simulation end-to-end de la data platform
 et du DataOps d'une entreprise multi-millions d'euros, stack 100% gratuite.
 
-- [`QUICKSTART.md`](QUICKSTART.md) — démarrer le projet en 8 étapes simples
+- [`STATUS.md`](STATUS.md) — **état des lieux** : où en est le projet, ce qui tourne, dette ouverte
+- [`QUICKSTART.md`](QUICKSTART.md) — démarrer le projet étape par étape
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — schéma du pipeline
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — plan de développement complet (10 sprints)
 - [`docs/MCD.md`](docs/MCD.md) — modèle conceptuel Réel/Budget/Forecast
 - [`docs/DETTE-TECHNIQUE.md`](docs/DETTE-TECHNIQUE.md) — raccourcis pris et leur plafond connu
 - [`docs/REFONTE-ERP.md`](docs/REFONTE-ERP.md) — diagnostic, mapping et migration de l'ERP legacy simulé
 - [`docs/DATA-CONTRACTS.md`](docs/DATA-CONTRACTS.md) — contrats JSON Schema, DLQ et classification RGPD
+- [`docs/DBT.md`](docs/DBT.md) — entrepôt dbt : couches, MDM, écarts Réel/Budget, allocations, tests
 
 ## Démarrer l'infra locale
 
@@ -82,13 +84,12 @@ curl http://localhost:11434/api/generate -d '{"model":"llama3.2:1b","prompt":"Bo
 
 ```bash
 ./.venv/Scripts/python.exe erp-legacy/generate_erp_legacy_export.py
-./.venv/Scripts/python.exe erp-legacy/migrate_erp_to_target.py
 ```
 
-Simule un export ERP legacy (2 500 lignes, avant le CRM), le nettoie, le
-réconcilie avec le CRM par fuzzy matching et le charge dans Postgres
-(schéma `erp_migre`). Détail complet, résultats chiffrés et limites
-connues : [`docs/REFONTE-ERP.md`](docs/REFONTE-ERP.md).
+Simule un export ERP legacy (2 500 lignes, avant le CRM). Diagnostic
+complet : [`docs/REFONTE-ERP.md`](docs/REFONTE-ERP.md). La migration
+proprement dite (`erp-legacy/migrate_erp_to_target.py`) se lance après les
+data contracts — voir la chaîne complète ci-dessous.
 
 ## Data contracts, qualité & RGPD
 
@@ -106,3 +107,18 @@ contrats et de la classification RGPD :
 ```bash
 docker exec bv-minio-bronze mc ls local/bronze --recursive
 ```
+
+## Entrepôt dbt (marts Contrôle de Gestion)
+
+Chaîne complète, dans l'ordre (chaque étape dépend de la précédente) :
+
+```bash
+./.venv/Scripts/python.exe data-contracts/ingest_to_bronze.py      # Bronze + DLQ
+./.venv/Scripts/python.exe erp-legacy/migrate_erp_to_target.py     # lit Bronze -> erp_migre
+./.venv/Scripts/python.exe data-contracts/load_bronze_to_raw.py    # Bronze -> Postgres schéma raw
+cd dbt_cg && DBT_PROFILES_DIR=. ../.venv/Scripts/dbt.exe build
+```
+
+21 modèles (staging + marts), 68 tests dbt. Écarts Réel/Budget, MDM golden
+record client, allocations analytiques : détail et chiffres réels dans
+[`docs/DBT.md`](docs/DBT.md).

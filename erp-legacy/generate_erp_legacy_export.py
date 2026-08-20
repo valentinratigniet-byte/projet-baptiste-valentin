@@ -138,6 +138,8 @@ def gen_lignes(legacy_clients):
 
 
 def main():
+    random.seed(7)
+    Faker.seed(7)
     print("Lecture des clients CRM (pour créer les variantes legacy)...")
     clients_crm = get_clients_crm()
     legacy_clients = build_legacy_clients(clients_crm)
@@ -165,7 +167,10 @@ def main():
 
 def demo():
     """Self-check minimal (dette technique #2). Dépend de MySQL (comme le
-    reste du script) : pas de version "pure" possible ici."""
+    reste du script) : pas de version "pure" possible ici. Re-seed en entrée
+    (voir generate_cg_data.py pour le même correctif de reproductibilité)."""
+    random.seed(7)
+    Faker.seed(7)
     clients_crm = get_clients_crm()
     legacy_clients = build_legacy_clients(clients_crm)
     rows = gen_lignes(legacy_clients)
