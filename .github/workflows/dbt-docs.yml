@@ -1,0 +1,67 @@
+name: dbt docs -> GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "dbt_cg/**"
+      - ".github/workflows/dbt-docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: dbt_dev
+          POSTGRES_USER: dbt_user
+          POSTGRES_PASSWORD: changeme
+        ports: ["5434:5432"]
+        options: >-
+          --health-cmd="pg_isready -U dbt_user"
+          --health-interval=5s --health-timeout=5s --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer dbt
+        run: pip install dbt-core dbt-postgres
+
+      - name: dbt docs generate
+        working-directory: dbt_cg
+        env:
+          DBT_PROFILES_DIR: .
+          POSTGRES_DB: dbt_dev
+          POSTGRES_USER: dbt_user
+          POSTGRES_PASSWORD: changeme
+        # Schéma Postgres vide (pas de pipeline de données ici, juste la doc) :
+        # dbt docs generate n'a besoin que d'une connexion vivante, pas que
+        # les relations existent déjà - le catalog sera juste creux pour les
+        # stats de lignes, la structure/lignage/descriptions restent complets.
+        run: dbt docs generate
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dbt_cg/target
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

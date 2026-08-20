@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  MYSQL_USER: crm_user
+  MYSQL_PASSWORD: changeme
+  MONGO_USER: mongo_admin
+  MONGO_PASSWORD: changeme
+  MINIO_ROOT_USER: minio_admin
+  MINIO_ROOT_PASSWORD: changeme123
+  POSTGRES_DB: dbt_dev
+  POSTGRES_USER: dbt_user
+  POSTGRES_PASSWORD: changeme
+  ANONYMIZATION_SALT: ci-salt-not-secret
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: changeme
+          MYSQL_DATABASE: crm
+          MYSQL_USER: crm_user
+          MYSQL_PASSWORD: changeme
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=5s --health-timeout=5s --health-retries=10
+      mongodb:
+        image: mongo:7
+        env:
+          MONGO_INITDB_ROOT_USERNAME: mongo_admin
+          MONGO_INITDB_ROOT_PASSWORD: changeme
+        ports: ["27017:27017"]
+        options: >-
+          --health-cmd="mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval=5s --health-timeout=5s --health-retries=10
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: dbt_dev
+          POSTGRES_USER: dbt_user
+          POSTGRES_PASSWORD: changeme
+        ports: ["5434:5432"]
+        options: >-
+          --health-cmd="pg_isready -U dbt_user"
+          --health-interval=5s --health-timeout=5s --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Démarrer MinIO (pas de "command" possible sur un service container)
+        run: |
+          docker run -d --name minio -p 9000:9000 -p 9001:9001 \
+            -e MINIO_ROOT_USER=minio_admin -e MINIO_ROOT_PASSWORD=changeme123 \
+            minio/minio server /data --console-address ":9001"
+          for i in $(seq 1 20); do
+            curl -sf http://localhost:9000/minio/health/live && break
+            sleep 2
+          done
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les dépendances
+        run: pip install -r requirements.txt
+
+      - name: Self-checks des générateurs (demo())
+        run: |
+          python -c "import sys; sys.path.insert(0,'data-generation'); import generate_cg_data as m; m.demo()"
+          python -c "import sys; sys.path.insert(0,'data-generation'); import generate_logs_mongo as m; m.demo()"
+
+      - name: Générer les données sources
+        run: |
+          python data-generation/generate_cg_data.py
+          python data-generation/generate_logs_mongo.py
+          python erp-legacy/generate_erp_legacy_export.py
+
+      - name: Self-checks ERP legacy (dépendent des données générées)
+        run: |
+          python -c "import sys; sys.path.insert(0,'erp-legacy'); import generate_erp_legacy_export as m; m.demo()"
+
+      - name: Data contracts -> Bronze (+ self-check du pipeline)
+        run: |
+          python -c "import sys; sys.path.insert(0,'data-contracts'); import ingest_to_bronze as m; m.demo()"
+          python data-contracts/ingest_to_bronze.py
+
+      - name: Migration ERP (lit Bronze) + self-check
+        run: |
+          python -c "import sys; sys.path.insert(0,'erp-legacy'); import migrate_erp_to_target as m; m.demo()"
+          python erp-legacy/migrate_erp_to_target.py
+
+      - name: Bronze -> Postgres (raw)
+        run: python data-contracts/load_bronze_to_raw.py
+
+      - name: dbt build (cible dev, Postgres)
+        working-directory: dbt_cg
+        env:
+          DBT_PROFILES_DIR: .
+        run: |
+          pip install dbt-core dbt-postgres
+          dbt build
