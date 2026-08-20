@@ -15,7 +15,7 @@ sprint.
 - Ollama : modèle `llama3.2:1b` opérationnel
 - Root cause SSL trouvée et corrigée (Avast Web/Mail Shield, pas juste contournée)
 
-## Sprint 2 — Refonte ERP (legacy → cible)
+## Sprint 2 — Refonte ERP (legacy → cible) ✅ terminé
 Nouveau chantier : démontrer une vraie compétence de refonte ERP, pas
 seulement de la génération de données propres.
 - Simuler un ERP legacy réaliste : schéma plat dénormalisé, codes obscurs
@@ -30,6 +30,14 @@ seulement de la génération de données propres.
 - Migration effective d'un sous-ensemble (contrôle de gestion) vers le
   pipeline construit aux sprints suivants
 - Livrable : `docs/REFONTE-ERP.md` (diagnostic + mapping + plan)
+
+  → tout réalisé : export legacy simulé (2 500 lignes, `erp-legacy/exports/`),
+  réconciliation client par fuzzy matching évaluée (précision 54%/rappel
+  100%/F1 70,1% — plafond de données réel et documenté, pas un bug),
+  mapping centre de coût, chargement dans Postgres (`erp_migre`), 2% de
+  lignes flaggées à corriger plutôt que rejetées silencieusement. Dette
+  ajoutée : absence de SIRET dans les deux générateurs (`DETTE-TECHNIQUE.md`
+  #7/#8, ciblée Sprint 4).
 
 ## Sprint 3 — Data Contracts, Qualité & Bronze
 - Schémas JSON Schema pour chaque flux (CRM, logs, Finance CSV, exports ERP legacy du Sprint 2)

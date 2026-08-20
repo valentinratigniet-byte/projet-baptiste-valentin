@@ -8,6 +8,7 @@ et du DataOps d'une entreprise multi-millions d'euros, stack 100% gratuite.
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — plan de développement complet (10 sprints)
 - [`docs/MCD.md`](docs/MCD.md) — modèle conceptuel Réel/Budget/Forecast
 - [`docs/DETTE-TECHNIQUE.md`](docs/DETTE-TECHNIQUE.md) — raccourcis pris et leur plafond connu
+- [`docs/REFONTE-ERP.md`](docs/REFONTE-ERP.md) — diagnostic, mapping et migration de l'ERP legacy simulé
 
 ## Démarrer l'infra locale
 
@@ -74,3 +75,15 @@ le résumé de veille et le chatbot Text-to-SQL des sprints suivants) :
 ```bash
 curl http://localhost:11434/api/generate -d '{"model":"llama3.2:1b","prompt":"Bonjour","stream":false}'
 ```
+
+## ERP legacy & migration
+
+```bash
+./.venv/Scripts/python.exe erp-legacy/generate_erp_legacy_export.py
+./.venv/Scripts/python.exe erp-legacy/migrate_erp_to_target.py
+```
+
+Simule un export ERP legacy (2 500 lignes, avant le CRM), le nettoie, le
+réconcilie avec le CRM par fuzzy matching et le charge dans Postgres
+(schéma `erp_migre`). Détail complet, résultats chiffrés et limites
+connues : [`docs/REFONTE-ERP.md`](docs/REFONTE-ERP.md).
