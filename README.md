@@ -9,6 +9,7 @@ et du DataOps d'une entreprise multi-millions d'euros, stack 100% gratuite.
 - [`docs/MCD.md`](docs/MCD.md) — modèle conceptuel Réel/Budget/Forecast
 - [`docs/DETTE-TECHNIQUE.md`](docs/DETTE-TECHNIQUE.md) — raccourcis pris et leur plafond connu
 - [`docs/REFONTE-ERP.md`](docs/REFONTE-ERP.md) — diagnostic, mapping et migration de l'ERP legacy simulé
+- [`docs/DATA-CONTRACTS.md`](docs/DATA-CONTRACTS.md) — contrats JSON Schema, DLQ et classification RGPD
 
 ## Démarrer l'infra locale
 
@@ -24,8 +25,9 @@ Postgres (dbt dev) `5434`, n8n `5678`, Ollama `11434`.
 > propre certificat racine. Ça casse `pip install` (fixé par `pip-system-certs`,
 > voir ci-dessous) et les appels HTTPS sortants des conteneurs (ex: Ollama qui
 > télécharge un modèle). Pour les conteneurs : `./scripts/fix-local-ssl.ps1`
-> (installe le certificat Avast dans le conteneur, puis `docker restart
-> <conteneur>` pour qu'il recharge son pool de certificats).
+> (auto-détecte Avast ; `-List` pour identifier le bon certificat sur une
+> autre machine, `-CertPattern "..."` pour le cibler), puis `docker restart
+> <conteneur>` pour qu'il recharge son pool de certificats.
 
 ## Environnement Python
 
@@ -47,7 +49,7 @@ Génère les dimensions + Réel/Budget/Forecast, charge `dim_client`,
 `dim_produit`, `fact_ventes_reel` dans MySQL (CRM), et écrit
 `dim_centre_cout`, `dim_compte`, `dim_version_budget`, `fact_budget`,
 `fact_forecast` en CSV dans `data-generation/output/` (simule un export
-Finance — ira en Bronze via les data contracts au Sprint 3).
+Finance, ingéré en Bronze via les data contracts — voir plus bas).
 
 ```bash
 ./.venv/Scripts/python.exe data-generation/generate_logs_mongo.py
@@ -87,3 +89,20 @@ Simule un export ERP legacy (2 500 lignes, avant le CRM), le nettoie, le
 réconcilie avec le CRM par fuzzy matching et le charge dans Postgres
 (schéma `erp_migre`). Détail complet, résultats chiffrés et limites
 connues : [`docs/REFONTE-ERP.md`](docs/REFONTE-ERP.md).
+
+## Data contracts, qualité & RGPD
+
+```bash
+./.venv/Scripts/python.exe data-contracts/ingest_to_bronze.py
+```
+
+Valide chaque flux (CRM, logs, Finance, ERP legacy) contre son contrat
+JSON Schema, anonymise le seul champ réellement personnel identifié
+(`responsable` d'un centre de coût), et route vers MinIO : conforme →
+`bronze/<flux>/`, rejeté → `rejects/<flux>/` avec le motif. Détail des 10
+contrats et de la classification RGPD :
+[`docs/DATA-CONTRACTS.md`](docs/DATA-CONTRACTS.md).
+
+```bash
+docker exec bv-minio-bronze mc ls local/bronze --recursive
+```

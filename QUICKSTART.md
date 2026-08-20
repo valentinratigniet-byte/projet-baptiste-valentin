@@ -1,7 +1,7 @@
 # Démarrage rapide
 
 Roadmap simple pour faire tourner le projet tel qu'il existe aujourd'hui
-(Sprint 1 terminé). Pour le plan de développement complet, voir
+(Sprints 1 à 3 terminés). Pour le plan de développement complet, voir
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Prérequis
@@ -46,15 +46,22 @@ Roadmap simple pour faire tourner le projet tel qu'il existe aujourd'hui
    ```bash
    ./.venv/Scripts/python.exe data-generation/generate_cg_data.py
    ./.venv/Scripts/python.exe data-generation/generate_logs_mongo.py
+   ./.venv/Scripts/python.exe erp-legacy/generate_erp_legacy_export.py
+   ./.venv/Scripts/python.exe erp-legacy/migrate_erp_to_target.py
    ```
 
-7. **Vérifier que ça tourne**
-   - MinIO console : http://localhost:9001
+7. **Valider et faire passer en Bronze** (contrats JSON Schema + RGPD + DLQ)
+   ```bash
+   ./.venv/Scripts/python.exe data-contracts/ingest_to_bronze.py
+   ```
+
+8. **Vérifier que ça tourne**
+   - MinIO console : http://localhost:9001 (buckets `bronze`/`rejects`)
    - n8n : http://localhost:5678 (identifiants dans `.env`)
    - Ollama : `curl http://localhost:11434/api/tags`
    - MySQL : `docker exec bv-mysql-crm mysql -u crm_user -p<mot de passe> crm -e "SELECT COUNT(*) FROM fact_ventes_reel;"`
 
-8. **Tout arrêter** (les données restent dans les volumes Docker)
+9. **Tout arrêter** (les données restent dans les volumes Docker)
    ```bash
    docker compose down
    ```

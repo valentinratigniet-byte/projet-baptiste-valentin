@@ -39,13 +39,25 @@ seulement de la génération de données propres.
   ajoutée : absence de SIRET dans les deux générateurs (`DETTE-TECHNIQUE.md`
   #7/#8, ciblée Sprint 4).
 
-## Sprint 3 — Data Contracts, Qualité & Bronze
+## Sprint 3 — Data Contracts, Qualité & Bronze ✅ terminé
 - Schémas JSON Schema pour chaque flux (CRM, logs, Finance CSV, exports ERP legacy du Sprint 2)
 - Validation à l'ingestion + Dead-Letter-Queue pour les rejets
 - Anonymisation RGPD (pseudonymisation des identifiants clients/personnes)
 - Écriture vers MinIO (bronze/, rejects/)
 - Ajout des self-checks `demo()` sur les générateurs Sprint 1 (dette #2)
 - Généralisation du script SSL (dette #1)
+
+  → tout réalisé : 10 schémas JSON Schema (`data-contracts/schemas/`),
+  pipeline unique `ingest_to_bronze.py` couvrant les 10 flux (MySQL, Mongo,
+  CSV Finance, CSV ERP legacy), 35 269 enregistrements acceptés → `bronze/`,
+  51 rejetés → `rejects/` (exactement les 51 dates invalides déjà repérées
+  au Sprint 2 — cohérence vérifiée). RGPD : un seul champ réellement
+  personnel identifié (`responsable`, nom de salarié) et anonymisé par hash
+  irréversible ; raisons sociales clients délibérément non anonymisées
+  (personnes morales, hors RGPD) — voir `docs/DATA-CONTRACTS.md` pour la
+  justification. Dette #1 et #2 (SSL, self-checks) soldées ; 2 nouvelles
+  dettes ouvertes (#7 pipeline sans self-check, #8 migration ERP non
+  branchée sur Bronze), ciblées Sprint 4.
 
 ## Sprint 4 — Entrepôt & Transformation
 - dbt multi-target opérationnel (Postgres dev / BigQuery prod)

@@ -78,5 +78,17 @@ def main():
     print("Terminé.")
 
 
+def demo():
+    """Self-check minimal (dette technique #2)."""
+    docs = gen_logs()
+    assert len(docs) > 0
+    assert all(1 <= d["client_id"] <= N_CLIENTS for d in docs)
+    assert all(d["event_type"] in EVENT_TYPES for d in docs)
+    assert all("produit_id" not in d or 1 <= d["produit_id"] <= N_PRODUITS for d in docs)
+    assert all(("message" in d) == (d["event_type"] == "error") for d in docs)
+    print(f"demo(): OK - {len(docs)} événements, tous invariants respectés")
+
+
 if __name__ == "__main__":
+    demo()
     main()

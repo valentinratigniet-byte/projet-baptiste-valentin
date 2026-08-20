@@ -163,5 +163,22 @@ def main():
     print(f"  référentiel client -> {ref_path}")
 
 
+def demo():
+    """Self-check minimal (dette technique #2). Dépend de MySQL (comme le
+    reste du script) : pas de version "pure" possible ici."""
+    clients_crm = get_clients_crm()
+    legacy_clients = build_legacy_clients(clients_crm)
+    rows = gen_lignes(legacy_clients)
+
+    assert len(legacy_clients) > 0
+    assert any(c["client_crm_id"] is None for c in legacy_clients), "aucun client legacy-only généré"
+    assert any(c["client_crm_id"] is not None for c in legacy_clients), "aucun client réconciliable généré"
+    assert len(rows) == N_LIGNES
+    assert all(r["DTPCE"] == "00/00/0000" or len(r["DTPCE"]) == 10 for r in rows)
+    assert all("," in r["MTHT"] for r in rows), "montants attendus en virgule décimale (format legacy)"
+    print(f"demo(): OK - {len(legacy_clients)} clients legacy, {len(rows)} lignes, invariants respectés")
+
+
 if __name__ == "__main__":
+    demo()
     main()

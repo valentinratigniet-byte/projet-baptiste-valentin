@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "dim_version_budget",
+  "type": "object",
+  "required": ["version_id", "libelle", "date_validation"],
+  "additionalProperties": false,
+  "properties": {
+    "version_id": {"type": "integer", "minimum": 1},
+    "libelle": {"type": "string", "minLength": 1},
+    "date_validation": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}
+  }
+}

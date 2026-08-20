@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "erp_vente_ligne",
+  "description": "Contrat structurel sur le flux ERP legacy brut, avant nettoyage. Valide la forme, pas la logique métier (le mapping/nettoyage reste au script de migration).",
+  "type": "object",
+  "required": ["CDSOC", "NUMPCE", "CDCLI", "RSCLI", "CDCC", "CDCPT", "DTPCE", "QTE", "MTHT", "MTTVA", "MTTTC", "FLGANO"],
+  "additionalProperties": false,
+  "properties": {
+    "CDSOC": {"type": "string", "pattern": "^[0-9]{4}$"},
+    "NUMPCE": {"type": "string", "pattern": "^V[0-9]{6}$"},
+    "CDCLI": {"type": "string", "pattern": "^([0-9]{5}|CLI[0-9]+)$"},
+    "RSCLI": {"type": "string", "minLength": 1},
+    "CDCC": {"type": "string"},
+    "CDCPT": {"type": "string", "pattern": "^[0-9]{6}$"},
+    "DTPCE": {"type": "string", "pattern": "^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}$"},
+    "QTE": {"type": "string", "pattern": "^[0-9]+$"},
+    "MTHT": {"type": "string", "pattern": "^-?[0-9]+,[0-9]{2}$"},
+    "MTTVA": {"type": "string", "pattern": "^-?[0-9]+,[0-9]{2}$"},
+    "MTTTC": {"type": "string", "pattern": "^-?[0-9]+,[0-9]{2}$"},
+    "FLGANO": {"type": "string", "enum": ["0", "1", ""]}
+  }
+}

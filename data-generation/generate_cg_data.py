@@ -232,5 +232,35 @@ def main():
     print("Terminé.")
 
 
+def demo():
+    """Self-check minimal (dette technique #2) : rejoue la génération pure
+    (pas de DB/IO) et vérifie les invariants de base. `assert` volontaire :
+    doit planter bruyamment si un futur refactor casse une borne d'ID ou une
+    jointure, comme l'a fait silencieusement le bug d'ID de compte hardcodé."""
+    dim_centre_cout = gen_dim_centre_cout()
+    dim_compte = gen_dim_compte()
+    dim_produit = gen_dim_produit()
+    dim_client = gen_dim_client()
+    fact_ventes_reel = gen_fact_ventes_reel(dim_produit, dim_client, dim_centre_cout, dim_compte)
+    fact_budget = gen_fact_budget(dim_centre_cout, dim_compte)
+    fact_forecast = gen_fact_forecast(fact_budget)
+
+    assert len(dim_centre_cout) == N_CENTRES
+    assert len(dim_compte) == N_COMPTES
+    assert len(dim_produit) == N_PRODUITS
+    assert len(dim_client) == N_CLIENTS
+    assert fact_ventes_reel["montant_reel"].min() > 0
+    assert fact_ventes_reel["produit_id"].between(1, N_PRODUITS).all()
+    assert fact_ventes_reel["client_id"].between(1, N_CLIENTS).all()
+    assert fact_ventes_reel["compte_id"].isin(dim_compte["compte_id"]).all()
+    assert fact_budget["montant_budget"].min() > 0
+    assert fact_budget["centre_cout_id"].isin(dim_centre_cout["centre_cout_id"]).all()
+    assert fact_forecast["montant_forecast"].min() > 0
+    assert not fact_ventes_reel.isnull().any().any()
+    print("demo(): OK -", len(fact_ventes_reel), "ventes,", len(fact_budget),
+          "budget,", len(fact_forecast), "forecast, tous invariants respectés")
+
+
 if __name__ == "__main__":
+    demo()
     main()

@@ -197,5 +197,22 @@ def main():
     print("Terminé.")
 
 
+def demo():
+    """Self-check minimal (dette technique #2). Lit les CSV + MySQL, pas
+    d'écriture Postgres."""
+    clients_crm = get_clients_crm()
+    reconciliation, verite_terrain = reconcile_clients(clients_crm)
+    precision, rappel, f1 = evaluer_matching(verite_terrain)
+    lignes = clean_lignes(reconciliation)
+
+    assert 0 <= precision <= 1 and 0 <= rappel <= 1 and 0 <= f1 <= 1
+    assert len(lignes) > 0
+    assert all(l["ligne_valide"] or l["motif_rejet"] for l in lignes), \
+        "une ligne invalide doit toujours porter un motif"
+    assert all(l["montant_ht"] is None or l["montant_ht"] >= 0 for l in lignes)
+    print(f"demo(): OK - {len(lignes)} lignes, matching F1={f1:.1%}, invariants respectés")
+
+
 if __name__ == "__main__":
+    demo()
     main()

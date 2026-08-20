@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "dim_centre_cout",
+  "type": "object",
+  "required": ["centre_cout_id", "code", "libelle", "responsable"],
+  "additionalProperties": false,
+  "properties": {
+    "centre_cout_id": {"type": "integer", "minimum": 1},
+    "code": {"type": "string", "pattern": "^CC[0-9]{3}$"},
+    "libelle": {"type": "string", "minLength": 1},
+    "responsable": {"type": "string", "minLength": 1},
+    "centre_parent_id": {"type": ["integer", "null"]}
+  }
+}
