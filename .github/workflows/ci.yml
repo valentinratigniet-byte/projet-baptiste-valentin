@@ -115,6 +115,11 @@ jobs:
           python traceability/scripts/export_erp_fiches.py --demo
           python traceability/scripts/extract_filiation.py
 
+      - name: Dashboards BI - self-checks + export réel (Postgres uniquement, pas de BigQuery en CI)
+        run: |
+          python dashboards/scripts/export_dashboard_data.py --demo
+          python dashboards/scripts/export_dashboard_data.py
+
       - name: MLOps - self-checks (demo(), pas de dépendance BigQuery/Ollama)
         run: |
           python -c "import sys; sys.path.insert(0,'mlops'); import forecast as m; m.demo()"

@@ -7041,5 +7041,16 @@
     root.appendChild(relGrid);
   }
 
+  // Lien profond (ex: depuis dashboards/index.html) : index.html#src_fact_ventes_erp_migre
+  // ouvre directement ce nœud sur le jeu "Projet réel", sans navigation manuelle.
+  const deepLinkId = decodeURIComponent(window.location.hash.slice(1));
+  if (deepLinkId && DATASETS.real && DATASETS.real[deepLinkId]) {
+    activeDatasetKey = "real";
+    nodes = DATASETS.real;
+    document.querySelectorAll(".ds-btn").forEach((b) => b.classList.toggle("active", b.dataset.ds === "real"));
+    buildSidebar(nodes);
+    if (canSeeNode(deepLinkId)) history = [deepLinkId];
+  }
+
   render();
 </script>

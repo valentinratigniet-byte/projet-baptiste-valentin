@@ -17,6 +17,7 @@ et du DataOps d'une entreprise multi-millions d'euros, stack 100% gratuite.
 - [`docs/SECRETS-CHECKLIST.md`](docs/SECRETS-CHECKLIST.md) — rotation des secrets avant exposition réseau
 - [`docs/MLOPS.md`](docs/MLOPS.md) — forecasting, détection de drift, chatbot BI Text-to-SQL
 - [`docs/TRACABILITE-KPI.md`](docs/TRACABILITE-KPI.md) — outil interactif de traçabilité KPI + fiche ERP native
+- [`docs/BI.md`](docs/BI.md) — 4 tableaux de bord (PDG, CG, RH, FinOps), preuve RLS/masking en direct
 - **Doc dbt en ligne** : https://valentinratigniet-byte.github.io/projet-baptiste-valentin/
 
 ## Démarrer l'infra locale
@@ -158,6 +159,14 @@ dépendance, aucun serveur) : clic sur n'importe quelle source/colonne/modèle
 → remonte le lignage jusqu'à la donnée brute, plus une fiche ERP native en
 lecture seule pour les tables issues de la migration Sprint 2. Régénérer
 après un `dbt run`/`dbt test` : voir [`docs/TRACABILITE-KPI.md`](docs/TRACABILITE-KPI.md).
+
+## Tableaux de bord BI
+
+Ouvrir [`dashboards/index.html`](dashboards/index.html) (aucune dépendance,
+aucun serveur) : 4 onglets (Exécutif/PDG, Contrôle de gestion, RH &
+Opérationnel, FinOps/Audit), données réelles régénérées par
+`dashboards/scripts/export_dashboard_data.py`. Détail et chiffres complets :
+[`docs/BI.md`](docs/BI.md).
 
 ## CI/CD
 

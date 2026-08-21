@@ -1,0 +1,1100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>Tableaux de bord — Contrôle de Gestion</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --gridline: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11, 11, 11, 0.10);
+    --series-1: #2a78d6; /* blue */
+    --series-2: #eb6834; /* orange */
+    --series-3: #1baf7a; /* aqua */
+    --diverging-pos: #2a78d6;
+    --diverging-neg: #e34948;
+    --status-good: #0ca30c;
+    --status-warning: #fab219;
+    --status-critical: #d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1: #1a1a19;
+      --page: #0d0d0d;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #898781;
+      --gridline: #2c2c2a;
+      --baseline: #383835;
+      --border: rgba(255, 255, 255, 0.10);
+      --series-1: #3987e5;
+      --series-2: #d95926;
+      --series-3: #199e70;
+      --diverging-pos: #3987e5;
+      --diverging-neg: #e66767;
+      --status-good: #0ca30c;
+      --status-warning: #fab219;
+      --status-critical: #d03b3b;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --page: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --gridline: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255, 255, 255, 0.10);
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --diverging-pos: #3987e5;
+    --diverging-neg: #e66767;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page);
+    color: var(--text-primary);
+  }
+  header {
+    padding: 20px 28px 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-1);
+  }
+  header h1 { margin: 0 0 4px; font-size: 20px; }
+  header p.sub { margin: 0 0 16px; color: var(--text-secondary); font-size: 13px; }
+  nav.tabs { display: flex; gap: 4px; }
+  nav.tabs button {
+    font: inherit; font-size: 13px; font-weight: 600;
+    background: none; border: none; cursor: pointer;
+    color: var(--text-secondary);
+    padding: 10px 14px; border-bottom: 2px solid transparent;
+  }
+  nav.tabs button.active { color: var(--text-primary); border-bottom-color: var(--series-1); }
+  nav.tabs button:hover { color: var(--text-primary); }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 28px 60px; }
+  section.tab { display: none; }
+  section.tab.active { display: block; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .tile {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .tile .label { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+  .tile .value { font-size: 24px; font-weight: 600; margin-top: 4px; }
+  .tile .note { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .info-link {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 1px solid var(--text-muted); color: var(--text-muted);
+    font-size: 10px; text-decoration: none; line-height: 1;
+    flex: none;
+  }
+  .info-link:hover { border-color: var(--series-1); color: var(--series-1); }
+
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 18px 20px; margin-bottom: 20px;
+  }
+  .card h2 { font-size: 14px; margin: 0 0 2px; }
+  .card p.desc { font-size: 12px; color: var(--text-secondary); margin: 0 0 14px; }
+  .card p.footnote { font-size: 11px; color: var(--text-muted); margin: 10px 0 0; }
+
+  .legend { display: flex; gap: 14px; margin-bottom: 8px; font-size: 12px; color: var(--text-secondary); }
+  .legend .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+
+  table.dtable { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.dtable th, table.dtable td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--gridline); }
+  table.dtable th { color: var(--text-secondary); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .02em; }
+  table.dtable td.num, table.dtable th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.dtable tr:last-child td { border-bottom: none; }
+
+  .status-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; }
+  .status-pill .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .status-pill.good { color: var(--status-good); }
+  .status-pill.good .dot { background: var(--status-good); }
+  .status-pill.critical { color: var(--status-critical); }
+  .status-pill.critical .dot { background: var(--status-critical); }
+
+  .bars { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: 160px 1fr 90px; align-items: center; gap: 10px; font-size: 12.5px; }
+  .bar-row .bar-label { color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-track { position: relative; height: 24px; background: var(--gridline); border-radius: 4px; overflow: visible; }
+  .bar-fill {
+    position: absolute; top: 0; left: 0; height: 100%; border-radius: 4px;
+    background: var(--series-1); cursor: default;
+  }
+  .bar-fill.neg { background: var(--diverging-neg); left: auto; right: 50%; }
+  .bar-fill.pos { background: var(--diverging-pos); left: 50%; }
+  .bar-row .bar-value { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+  .bar-fill:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: 120%; left: 0; white-space: nowrap;
+    background: var(--text-primary); color: var(--surface-1);
+    font-size: 11px; padding: 3px 6px; border-radius: 4px; pointer-events: none;
+  }
+
+  svg.linechart { width: 100%; height: 220px; overflow: visible; }
+  svg.linechart .gridline { stroke: var(--gridline); stroke-width: 1; }
+  svg.linechart .axis-text { fill: var(--text-muted); font-size: 10px; }
+  svg.linechart .line-path { fill: none; stroke: var(--series-1); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  svg.linechart .area-fill { fill: var(--series-1); opacity: .10; }
+  svg.linechart .hover-dot { fill: var(--series-1); stroke: var(--surface-1); stroke-width: 2; }
+  .chart-tooltip {
+    position: absolute; pointer-events: none; background: var(--text-primary); color: var(--surface-1);
+    font-size: 11px; padding: 4px 8px; border-radius: 4px; white-space: nowrap; z-index: 5;
+    transform: translate(-50%, -130%);
+  }
+  .chart-wrap { position: relative; }
+
+  .rgpd-box { background: var(--page); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; font-size: 12.5px; }
+  .rgpd-box code { background: var(--gridline); padding: 1px 5px; border-radius: 3px; }
+
+  footer { max-width: 1100px; margin: 0 auto; padding: 0 28px 40px; font-size: 11px; color: var(--text-muted); }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tableaux de bord — Contrôle de Gestion</h1>
+  <p class="sub">Sprint 9 · données réelles (Postgres <code>dbt_cg</code> + BigQuery <code>bv-dataplatform</code>), régénérées par <code>scripts/export_dashboard_data.py</code>. Les ⓘ renvoient à la <a href="../traceability/index.html" target="_blank" rel="noopener">traçabilité KPI</a> (Sprint 8).</p>
+  <nav class="tabs">
+    <button type="button" data-tab="pdg" class="active">Exécutif / PDG</button>
+    <button type="button" data-tab="cg">Contrôle de gestion</button>
+    <button type="button" data-tab="rh">RH &amp; Opérationnel</button>
+    <button type="button" data-tab="finops">FinOps / Audit</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============ PDG ============ -->
+  <section class="tab active" id="tab-pdg">
+    <div class="tiles" id="pdg-tiles"></div>
+
+    <div class="card">
+      <h2>Évolution mensuelle du chiffre d'affaires réel</h2>
+      <p class="desc">Somme mensuelle de <code>fct_ventes_reel.montant_reel</code>, toutes sources confondues (CRM + ERP legacy migré).</p>
+      <div class="chart-wrap" id="pdg-evolution"></div>
+      <p class="footnote">Axe X à intervalles réguliers, pas une échelle calendaire réelle : le jeu de données ne contient aucune vente entre octobre et décembre 2024 (41 mois réels sur 44 possibles) — ce trou n'apparaît pas visuellement ici.</p>
+    </div>
+
+    <div class="card">
+      <h2>Top centres de coûts par chiffre d'affaires <a class="info-link" href="../traceability/index.html#dim_centre_cout" target="_blank" rel="noopener" title="Voir la traçabilité de dim_centre_cout">i</a></h2>
+      <p class="desc">Le champ « responsable » est pseudonymisé (RGPD, Sprint 3) — voir l'onglet RH &amp; Opérationnel.</p>
+      <div class="bars" id="pdg-top-centres"></div>
+    </div>
+  </section>
+
+  <!-- ============ Contrôle de gestion ============ -->
+  <section class="tab" id="tab-cg">
+    <div class="card">
+      <h2>Réel vs Budget par nature de compte <a class="info-link" href="../traceability/index.html#fct_ecarts_reel_budget" target="_blank" rel="noopener" title="Voir la traçabilité de fct_ecarts_reel_budget">i</a></h2>
+      <p class="desc">« charge » n'a aucun montant réel : <code>fct_ventes_reel</code> ne contient que du chiffre d'affaires, pas de charges réelles (limite documentée, <code>docs/DETTE-TECHNIQUE.md</code> #2).</p>
+      <div class="legend">
+        <span><span class="swatch" style="background:var(--series-1)"></span>Réel</span>
+        <span><span class="swatch" style="background:var(--series-2)"></span>Budget</span>
+      </div>
+      <div id="cg-nature"></div>
+    </div>
+
+    <div class="card">
+      <h2>Top 10 écarts Réel / Budget (valeur absolue)</h2>
+      <p class="desc">Bleu = réel au-dessus du budget, rouge = en dessous — pas de jugement porté sur le sens (voir note ci-dessus sur la nature des comptes).</p>
+      <div id="cg-ecarts"></div>
+    </div>
+
+    <div class="card">
+      <h2>Allocation du CA « Non affecté » <a class="info-link" href="../traceability/index.html#fct_allocation_couts" target="_blank" rel="noopener" title="Voir la traçabilité de fct_allocation_couts">i</a></h2>
+      <p class="desc">Répartition au prorata du CA propre de chaque centre — ce modèle ventile du CA non affecté, pas des charges indirectes (dette technique #2 également).</p>
+      <table class="dtable" id="cg-allocation-table"></table>
+    </div>
+  </section>
+
+  <!-- ============ RH & Opérationnel ============ -->
+  <section class="tab" id="tab-rh">
+    <div class="card">
+      <p class="desc" style="margin-bottom:14px">Ce projet Contrôle de Gestion n'a pas d'entité RH dans son modèle (<code>docs/MCD.md</code> — pas d'effectif, pas de masse salariale). Cet onglet combine donc pilotage par responsable de centre de coût et santé opérationnelle du pipeline, plutôt que des KPIs RH classiques qui n'existent pas dans les données.</p>
+    </div>
+
+    <div class="card">
+      <h2>Chiffre d'affaires par responsable de centre de coût</h2>
+      <div class="bars" id="rh-responsables"></div>
+    </div>
+
+    <div class="card">
+      <h2>Donnée personnelle (RGPD) <a class="info-link" href="../traceability/index.html#dim_centre_cout" target="_blank" rel="noopener" title="Voir le rôle RH dans la traçabilité">i</a></h2>
+      <div class="rgpd-box" id="rh-rgpd"></div>
+    </div>
+
+    <div class="tiles" id="rh-pipeline-tiles"></div>
+
+    <div class="card">
+      <h2>Tests dbt — dernier <code>dbt build</code></h2>
+      <div id="rh-dbt-tests"></div>
+    </div>
+  </section>
+
+  <!-- ============ FinOps / Audit ============ -->
+  <section class="tab" id="tab-finops">
+    <div class="card">
+      <h2>RLS + masking — preuve par requête réelle <a class="info-link" href="../traceability/index.html#fct_ecarts_reel_budget" target="_blank" rel="noopener" title="Voir la traçabilité de fct_ecarts_reel_budget">i</a></h2>
+      <p class="desc"><code>SELECT COUNT(*)</code> et <code>SELECT SUM(montant_reel)</code> sur <code>marts.fct_ecarts_reel_budget</code>, exécutés avec les 4 comptes de service réels. Rejouable : <code>python governance/test_acces_par_profil.py</code>.</p>
+      <table class="dtable" id="finops-rls-table"></table>
+      <p class="footnote" id="finops-rls-note"></p>
+    </div>
+
+    <div class="card">
+      <h2>Stockage &amp; partitionnement BigQuery (dataset <code>marts</code>)</h2>
+      <table class="dtable" id="finops-tables-table"></table>
+      <p class="footnote" id="finops-cost-note"></p>
+    </div>
+
+    <div class="card">
+      <h2>Dette technique liée à la gouvernance</h2>
+      <p class="desc">Détail complet : <a href="../docs/DETTE-TECHNIQUE.md" target="_blank" rel="noopener">docs/DETTE-TECHNIQUE.md</a></p>
+      <ul style="font-size:12.5px; color:var(--text-secondary); margin:0; padding-left:18px;">
+        <li>#5 — RLS/masking appliqués à 1 mart sur 11 (profondeur plutôt que largeur)</li>
+        <li>#6 — comptes de service, pas de vrais comptes Google Workspace par utilisateur</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Généré le <span id="footer-generated-at">—</span> ·
+  <a href="../STATUS.md" target="_blank" rel="noopener">STATUS.md</a> ·
+  <a href="../docs/DETTE-TECHNIQUE.md" target="_blank" rel="noopener">Dette technique</a>
+</footer>
+
+<script>
+  // DASHBOARD-DATA:BEGIN (ne pas éditer à la main — régénéré par scripts/export_dashboard_data.py)
+  const DASHBOARD_DATA = {
+  "pdg": {
+    "ca_total": "19128502.08",
+    "clients_actifs": 500,
+    "nb_centres": 16,
+    "budget_total": "56012612.16",
+    "forecast_total": "41860249.99",
+    "ecart_total": "1028172.99",
+    "top_centres": [
+      {
+        "libelle": "Ventes",
+        "responsable": "Salarie_1c98d7859f",
+        "ca": "5784278.88"
+      },
+      {
+        "libelle": "Direction régionale Nord",
+        "responsable": "Salarie_379d9e42fa",
+        "ca": "3798427.25"
+      },
+      {
+        "libelle": "Direction régionale Sud",
+        "responsable": "Salarie_40c94babb6",
+        "ca": "3673895.64"
+      },
+      {
+        "libelle": "Production",
+        "responsable": "Salarie_3c48a630ee",
+        "ca": "2000433.35"
+      },
+      {
+        "libelle": "Non affecté",
+        "responsable": null,
+        "ca": "1978918.16"
+      },
+      {
+        "libelle": "Marketing",
+        "responsable": "Salarie_654a076d89",
+        "ca": "1892548.80"
+      }
+    ],
+    "evolution_mensuelle": [
+      {
+        "mois": "2023-01",
+        "ca": "364361.03"
+      },
+      {
+        "mois": "2023-02",
+        "ca": "354192.96"
+      },
+      {
+        "mois": "2023-03",
+        "ca": "359541.09"
+      },
+      {
+        "mois": "2023-04",
+        "ca": "370928.77"
+      },
+      {
+        "mois": "2023-05",
+        "ca": "369358.83"
+      },
+      {
+        "mois": "2023-06",
+        "ca": "369638.35"
+      },
+      {
+        "mois": "2023-07",
+        "ca": "400422.56"
+      },
+      {
+        "mois": "2023-08",
+        "ca": "362528.72"
+      },
+      {
+        "mois": "2023-09",
+        "ca": "313432.93"
+      },
+      {
+        "mois": "2023-10",
+        "ca": "390794.32"
+      },
+      {
+        "mois": "2023-11",
+        "ca": "375299.88"
+      },
+      {
+        "mois": "2023-12",
+        "ca": "394374.58"
+      },
+      {
+        "mois": "2024-01",
+        "ca": "401584.35"
+      },
+      {
+        "mois": "2024-02",
+        "ca": "369791.74"
+      },
+      {
+        "mois": "2024-03",
+        "ca": "401342.80"
+      },
+      {
+        "mois": "2024-04",
+        "ca": "380119.95"
+      },
+      {
+        "mois": "2024-05",
+        "ca": "449992.28"
+      },
+      {
+        "mois": "2024-06",
+        "ca": "375961.49"
+      },
+      {
+        "mois": "2024-07",
+        "ca": "476891.63"
+      },
+      {
+        "mois": "2024-08",
+        "ca": "456559.71"
+      },
+      {
+        "mois": "2024-09",
+        "ca": "66534.92"
+      },
+      {
+        "mois": "2025-01",
+        "ca": "651175.11"
+      },
+      {
+        "mois": "2025-02",
+        "ca": "600230.94"
+      },
+      {
+        "mois": "2025-03",
+        "ca": "628565.55"
+      },
+      {
+        "mois": "2025-04",
+        "ca": "581904.36"
+      },
+      {
+        "mois": "2025-05",
+        "ca": "640838.30"
+      },
+      {
+        "mois": "2025-06",
+        "ca": "607600.63"
+      },
+      {
+        "mois": "2025-07",
+        "ca": "532075.99"
+      },
+      {
+        "mois": "2025-08",
+        "ca": "626613.61"
+      },
+      {
+        "mois": "2025-09",
+        "ca": "567414.65"
+      },
+      {
+        "mois": "2025-10",
+        "ca": "521724.42"
+      },
+      {
+        "mois": "2025-11",
+        "ca": "532332.09"
+      },
+      {
+        "mois": "2025-12",
+        "ca": "582466.96"
+      },
+      {
+        "mois": "2026-01",
+        "ca": "510597.88"
+      },
+      {
+        "mois": "2026-02",
+        "ca": "568835.92"
+      },
+      {
+        "mois": "2026-03",
+        "ca": "550014.00"
+      },
+      {
+        "mois": "2026-04",
+        "ca": "558083.12"
+      },
+      {
+        "mois": "2026-05",
+        "ca": "563493.80"
+      },
+      {
+        "mois": "2026-06",
+        "ca": "631380.00"
+      },
+      {
+        "mois": "2026-07",
+        "ca": "523500.04"
+      },
+      {
+        "mois": "2026-08",
+        "ca": "346001.82"
+      }
+    ]
+  },
+  "cg": {
+    "top_ecarts": [
+      {
+        "centre": "Direction régionale Sud",
+        "compte": "Ventes produits",
+        "periode": "2025-01",
+        "reel": "247658.16",
+        "budget": "152759.08",
+        "ecart": "94899.08",
+        "ecart_pct": "62.1"
+      },
+      {
+        "centre": "Direction régionale Nord",
+        "compte": "Ventes produits",
+        "periode": "2025-08",
+        "reel": "241157.55",
+        "budget": "154191.43",
+        "ecart": "86966.12",
+        "ecart_pct": "56.4"
+      },
+      {
+        "centre": "Direction régionale Sud",
+        "compte": "Ventes produits",
+        "periode": "2025-04",
+        "reel": "213094.29",
+        "budget": "142223.97",
+        "ecart": "70870.32",
+        "ecart_pct": "49.8"
+      },
+      {
+        "centre": "Direction régionale Nord",
+        "compte": "Ventes produits",
+        "periode": "2025-02",
+        "reel": "243695.94",
+        "budget": "177034.6",
+        "ecart": "66661.34",
+        "ecart_pct": "37.7"
+      },
+      {
+        "centre": "Ventes",
+        "compte": "Ventes produits",
+        "periode": "2025-05",
+        "reel": "242344.57",
+        "budget": "179300.59",
+        "ecart": "63043.98",
+        "ecart_pct": "35.2"
+      },
+      {
+        "centre": "Direction régionale Sud",
+        "compte": "Ventes produits",
+        "periode": "2025-12",
+        "reel": "200905.03",
+        "budget": "142223.97",
+        "ecart": "58681.06",
+        "ecart_pct": "41.3"
+      },
+      {
+        "centre": "Direction régionale Sud",
+        "compte": "Ventes produits",
+        "periode": "2025-05",
+        "reel": "208800.02",
+        "budget": "152759.08",
+        "ecart": "56040.94",
+        "ecart_pct": "36.7"
+      },
+      {
+        "centre": "Direction régionale Sud",
+        "compte": "Ventes produits",
+        "periode": "2026-05",
+        "reel": "208562.00",
+        "budget": "152759.08",
+        "ecart": "55802.92",
+        "ecart_pct": "36.5"
+      },
+      {
+        "centre": "Ventes",
+        "compte": "Ventes produits",
+        "periode": "2026-04",
+        "reel": "221519.82",
+        "budget": "166935.03",
+        "ecart": "54584.79",
+        "ecart_pct": "32.7"
+      },
+      {
+        "centre": "Ventes",
+        "compte": "Ventes produits",
+        "periode": "2025-07",
+        "reel": "150848.48",
+        "budget": "204031.71",
+        "ecart": "-53183.23",
+        "ecart_pct": "-26.1"
+      }
+    ],
+    "nature": [
+      {
+        "nature": "produit",
+        "nb_lignes": 156,
+        "reel": "19128502.08",
+        "budget": "12356011.44"
+      },
+      {
+        "nature": "charge",
+        "nb_lignes": 2160,
+        "reel": null,
+        "budget": "43656600.72"
+      }
+    ],
+    "allocation": [
+      {
+        "centre": "Ventes",
+        "ca_propre": "5784278.88",
+        "cle_repartition": "0.3373",
+        "montant_alloue": "667457.27"
+      },
+      {
+        "centre": "Direction régionale Nord",
+        "ca_propre": "3798427.25",
+        "cle_repartition": "0.2215",
+        "montant_alloue": "438306.65"
+      },
+      {
+        "centre": "Direction régionale Sud",
+        "ca_propre": "3673895.64",
+        "cle_repartition": "0.2142",
+        "montant_alloue": "423936.75"
+      },
+      {
+        "centre": "Production",
+        "ca_propre": "2000433.35",
+        "cle_repartition": "0.1166",
+        "montant_alloue": "230833.23"
+      },
+      {
+        "centre": "Marketing",
+        "ca_propre": "1892548.80",
+        "cle_repartition": "0.1104",
+        "montant_alloue": "218384.26"
+      }
+    ]
+  },
+  "rh": {
+    "responsables": [
+      {
+        "centre": "Ventes",
+        "responsable": "Salarie_1c98d7859f",
+        "ca": "5784278.88"
+      },
+      {
+        "centre": "Direction régionale Nord",
+        "responsable": "Salarie_379d9e42fa",
+        "ca": "3798427.25"
+      },
+      {
+        "centre": "Direction régionale Sud",
+        "responsable": "Salarie_40c94babb6",
+        "ca": "3673895.64"
+      },
+      {
+        "centre": "Production",
+        "responsable": "Salarie_3c48a630ee",
+        "ca": "2000433.35"
+      },
+      {
+        "centre": "Marketing",
+        "responsable": "Salarie_654a076d89",
+        "ca": "1892548.80"
+      }
+    ],
+    "pipeline": {
+      "crm_lignes": 4442,
+      "erp_valides": 2327,
+      "logs_events": 23841,
+      "budget_lignes": 2232,
+      "forecast_lignes": 1674
+    }
+  },
+  "dbt": {
+    "tests_total": 47,
+    "tests_ok": 47,
+    "models_total": 21,
+    "generated_at": "2026-08-20T19:26:17.050581Z"
+  },
+  "finops": {
+    "rls_profils": [
+      {
+        "profil": "rh-viewer",
+        "lignes_visibles": 0,
+        "montant_visible": null
+      },
+      {
+        "profil": "finance-viewer",
+        "lignes_visibles": 2240,
+        "montant_visible": 11847943.82
+      },
+      {
+        "profil": "direction-viewer",
+        "lignes_visibles": 2240,
+        "montant_visible": 11847943.82
+      },
+      {
+        "profil": "pdg-viewer",
+        "lignes_visibles": 2240,
+        "montant_visible": 11847943.82
+      }
+    ],
+    "tables_bigquery": [
+      {
+        "table": "dim_centre_cout",
+        "rows": 16,
+        "mb": 0.0007,
+        "partitioned_by": null,
+        "retention_jours": null
+      },
+      {
+        "table": "fct_ecarts_reel_budget",
+        "rows": 2240,
+        "mb": 0.0882,
+        "partitioned_by": "periode",
+        "retention_jours": 730
+      },
+      {
+        "table": "ml_forecast_reel",
+        "rows": 9,
+        "mb": 0.0006,
+        "partitioned_by": null,
+        "retention_jours": null
+      }
+    ]
+  }
+};
+  // DASHBOARD-DATA:END
+
+  // ---------- Formatage ----------
+
+  function fmtEUR(n, { compact = false } = {}) {
+    if (n === null || n === undefined || Number.isNaN(n)) return "—";
+    if (compact) {
+      const abs = Math.abs(n);
+      if (abs >= 1_000_000) return (n / 1_000_000).toLocaleString("fr-FR", { maximumFractionDigits: 1 }) + " M€";
+      if (abs >= 1_000) return (n / 1_000).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " k€";
+    }
+    return n.toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " €";
+  }
+  function fmtNum(n) {
+    if (n === null || n === undefined) return "—";
+    return n.toLocaleString("fr-FR");
+  }
+  function fmtPct(n) {
+    if (n === null || n === undefined) return "—";
+    return (n > 0 ? "+" : "") + n.toLocaleString("fr-FR", { maximumFractionDigits: 1 }) + " %";
+  }
+
+  // ---------- Tabs ----------
+
+  document.querySelectorAll("nav.tabs button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("nav.tabs button").forEach((b) => b.classList.toggle("active", b === btn));
+      document.querySelectorAll("section.tab").forEach((s) => s.classList.toggle("active", s.id === "tab-" + btn.dataset.tab));
+    });
+  });
+
+  // ---------- Stat tile ----------
+
+  function tile(container, { label, value, note, infoHref }) {
+    const div = document.createElement("div");
+    div.className = "tile";
+    const l = document.createElement("div");
+    l.className = "label";
+    l.textContent = label;
+    if (infoHref) {
+      const a = document.createElement("a");
+      a.className = "info-link";
+      a.href = infoHref;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = "i";
+      l.appendChild(a);
+    }
+    const v = document.createElement("div");
+    v.className = "value";
+    v.textContent = value;
+    div.append(l, v);
+    if (note) {
+      const n = document.createElement("div");
+      n.className = "note";
+      n.textContent = note;
+      div.appendChild(n);
+    }
+    container.appendChild(div);
+  }
+
+  // ---------- Bar chart (horizontal, single series) ----------
+
+  function barChart(container, items, { label, value, formatValue = fmtEUR, max = null }) {
+    container.innerHTML = "";
+    const wrap = document.createElement("div");
+    wrap.className = "bars";
+    const maxVal = max || Math.max(...items.map((d) => Math.abs(value(d))), 1);
+    for (const d of items) {
+      const row = document.createElement("div");
+      row.className = "bar-row";
+      const lab = document.createElement("div");
+      lab.className = "bar-label";
+      lab.textContent = label(d);
+      lab.title = label(d);
+      const track = document.createElement("div");
+      track.className = "bar-track";
+      const fill = document.createElement("div");
+      fill.className = "bar-fill";
+      const v = value(d);
+      fill.style.width = Math.max(2, (Math.abs(v) / maxVal) * 100) + "%";
+      fill.dataset.tip = formatValue(v);
+      track.appendChild(fill);
+      const val = document.createElement("div");
+      val.className = "bar-value";
+      val.textContent = formatValue(v);
+      row.append(lab, track, val);
+      wrap.appendChild(row);
+    }
+    container.appendChild(wrap);
+  }
+
+  // ---------- Diverging bar chart (centered at 0) ----------
+
+  function divergingBarChart(container, items, { label, value, formatValue = fmtEUR }) {
+    container.innerHTML = "";
+    const wrap = document.createElement("div");
+    wrap.className = "bars";
+    const maxVal = Math.max(...items.map((d) => Math.abs(value(d))), 1);
+    for (const d of items) {
+      const row = document.createElement("div");
+      row.className = "bar-row";
+      const lab = document.createElement("div");
+      lab.className = "bar-label";
+      lab.textContent = label(d);
+      lab.title = label(d);
+      const track = document.createElement("div");
+      track.className = "bar-track";
+      const fill = document.createElement("div");
+      const v = value(d);
+      fill.className = "bar-fill " + (v >= 0 ? "pos" : "neg");
+      fill.style.width = Math.max(2, (Math.abs(v) / maxVal) * 50) + "%";
+      fill.dataset.tip = formatValue(v);
+      track.appendChild(fill);
+      const val = document.createElement("div");
+      val.className = "bar-value";
+      val.textContent = formatValue(v);
+      row.append(lab, track, val);
+      wrap.appendChild(row);
+    }
+    container.appendChild(wrap);
+  }
+
+  // ---------- Grouped bar chart (2 series, categorical x) ----------
+
+  function groupedBarChart(container, items, { category, series, formatValue = fmtEUR }) {
+    container.innerHTML = "";
+    const wrap = document.createElement("div");
+    wrap.className = "bars";
+    const maxVal = Math.max(...items.flatMap((d) => series.map((s) => Math.abs(s.value(d)) || 0)), 1);
+    for (const d of items) {
+      for (const s of series) {
+        const row = document.createElement("div");
+        row.className = "bar-row";
+        const lab = document.createElement("div");
+        lab.className = "bar-label";
+        lab.textContent = category(d) + " · " + s.name;
+        const track = document.createElement("div");
+        track.className = "bar-track";
+        const fill = document.createElement("div");
+        fill.className = "bar-fill";
+        fill.style.background = s.color;
+        const v = s.value(d) || 0;
+        fill.style.width = Math.max(v ? 2 : 0, (Math.abs(v) / maxVal) * 100) + "%";
+        fill.dataset.tip = formatValue(v);
+        track.appendChild(fill);
+        const val = document.createElement("div");
+        val.className = "bar-value";
+        val.textContent = formatValue(v);
+        row.append(lab, track, val);
+        wrap.appendChild(row);
+      }
+    }
+    container.appendChild(wrap);
+  }
+
+  // ---------- Line chart (single series, with hover tooltip) ----------
+
+  function lineChart(container, points, { x, y, formatX = (v) => v, formatY = fmtEUR }) {
+    container.innerHTML = "";
+    const W = 900, H = 220, padL = 50, padR = 10, padT = 10, padB = 24;
+    const innerW = W - padL - padR, innerH = H - padT - padB;
+    const xs = points.map(x), ys = points.map(y);
+    const yMax = Math.max(...ys) * 1.1;
+    const xPos = (i) => padL + (innerW * i) / Math.max(1, points.length - 1);
+    const yPos = (v) => padT + innerH - (innerH * v) / yMax;
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.classList.add("linechart");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+
+    // Gridlines (4 horizontal steps)
+    for (let i = 0; i <= 3; i++) {
+      const v = (yMax / 3) * i;
+      const yy = yPos(v);
+      const gl = document.createElementNS(svgNS, "line");
+      gl.setAttribute("class", "gridline");
+      gl.setAttribute("x1", padL); gl.setAttribute("x2", W - padR);
+      gl.setAttribute("y1", yy); gl.setAttribute("y2", yy);
+      svg.appendChild(gl);
+      const t = document.createElementNS(svgNS, "text");
+      t.setAttribute("class", "axis-text");
+      t.setAttribute("x", 4); t.setAttribute("y", yy + 3);
+      t.textContent = formatY(v, { compact: true });
+      svg.appendChild(t);
+    }
+
+    // X labels: every ~6th point
+    points.forEach((p, i) => {
+      if (i % 6 !== 0 && i !== points.length - 1) return;
+      const t = document.createElementNS(svgNS, "text");
+      t.setAttribute("class", "axis-text");
+      t.setAttribute("x", xPos(i)); t.setAttribute("y", H - 6);
+      t.setAttribute("text-anchor", "middle");
+      t.textContent = formatX(x(p));
+      svg.appendChild(t);
+    });
+
+    // Area + line
+    const linePts = points.map((p, i) => `${xPos(i)},${yPos(y(p))}`).join(" L ");
+    const area = document.createElementNS(svgNS, "path");
+    area.setAttribute("class", "area-fill");
+    area.setAttribute("d", `M ${xPos(0)},${yPos(0)} L ${linePts} L ${xPos(points.length - 1)},${yPos(0)} Z`);
+    svg.appendChild(area);
+
+    const line = document.createElementNS(svgNS, "path");
+    line.setAttribute("class", "line-path");
+    line.setAttribute("d", `M ${linePts}`);
+    svg.appendChild(line);
+
+    const hoverDot = document.createElementNS(svgNS, "circle");
+    hoverDot.setAttribute("class", "hover-dot");
+    hoverDot.setAttribute("r", 5);
+    hoverDot.style.display = "none";
+    svg.appendChild(hoverDot);
+
+    const wrapDiv = document.createElement("div");
+    wrapDiv.className = "chart-wrap";
+    wrapDiv.appendChild(svg);
+    const tooltip = document.createElement("div");
+    tooltip.className = "chart-tooltip";
+    tooltip.style.display = "none";
+    wrapDiv.appendChild(tooltip);
+    container.appendChild(wrapDiv);
+
+    svg.addEventListener("mousemove", (e) => {
+      const rect = svg.getBoundingClientRect();
+      const mx = ((e.clientX - rect.left) / rect.width) * W;
+      let idx = Math.round(((mx - padL) / innerW) * (points.length - 1));
+      idx = Math.max(0, Math.min(points.length - 1, idx));
+      const p = points[idx];
+      hoverDot.setAttribute("cx", xPos(idx));
+      hoverDot.setAttribute("cy", yPos(y(p)));
+      hoverDot.style.display = "";
+      tooltip.style.display = "";
+      tooltip.style.left = ((xPos(idx) / W) * 100) + "%";
+      tooltip.style.top = ((yPos(y(p)) / H) * 100) + "%";
+      tooltip.textContent = formatX(x(p)) + " — " + formatY(y(p));
+    });
+    svg.addEventListener("mouseleave", () => {
+      hoverDot.style.display = "none";
+      tooltip.style.display = "none";
+    });
+  }
+
+  // ---------- PDG ----------
+
+  function renderPdg(d) {
+    if (!d) return;
+    const tiles = document.getElementById("pdg-tiles");
+    tiles.innerHTML = "";
+    tile(tiles, { label: "CA réel total", value: fmtEUR(d.ca_total, { compact: true }), infoHref: "../traceability/index.html#fct_ventes_reel" });
+    tile(tiles, { label: "Écart Réel / Budget", value: fmtEUR(d.ecart_total, { compact: true }), note: "sur les comptes où réel et budget existent tous les deux", infoHref: "../traceability/index.html#fct_ecarts_reel_budget" });
+    tile(tiles, { label: "Clients actifs", value: fmtNum(d.clients_actifs) });
+    tile(tiles, { label: "Centres de coûts", value: fmtNum(d.nb_centres) });
+    tile(tiles, { label: "Budget total (CA + charges)", value: fmtEUR(d.budget_total, { compact: true }), note: "voir onglet CG : le réel ne couvre que le CA" });
+    tile(tiles, { label: "Forecast total", value: fmtEUR(d.forecast_total, { compact: true }) });
+
+    lineChart(document.getElementById("pdg-evolution"), d.evolution_mensuelle, {
+      x: (p) => p.mois, y: (p) => Number(p.ca), formatY: fmtEUR,
+    });
+
+    barChart(document.getElementById("pdg-top-centres"), d.top_centres, {
+      label: (r) => r.libelle, value: (r) => Number(r.ca),
+    });
+  }
+
+  // ---------- Contrôle de gestion ----------
+
+  function renderCg(d) {
+    if (!d) return;
+    groupedBarChart(document.getElementById("cg-nature"), d.nature, {
+      category: (r) => r.nature,
+      series: [
+        { name: "Réel", value: (r) => Number(r.reel) || 0, color: "var(--series-1)" },
+        { name: "Budget", value: (r) => Number(r.budget) || 0, color: "var(--series-2)" },
+      ],
+    });
+
+    divergingBarChart(document.getElementById("cg-ecarts"), d.top_ecarts, {
+      label: (r) => `${r.centre} · ${r.compte} · ${r.periode}`,
+      value: (r) => Number(r.ecart),
+    });
+
+    const table = document.getElementById("cg-allocation-table");
+    table.innerHTML = `
+      <thead><tr><th>Centre de coût</th><th class="num">CA propre</th><th class="num">Clé de répartition</th><th class="num">Montant alloué</th></tr></thead>
+      <tbody>${d.allocation.map((r) => `
+        <tr><td>${r.centre}</td><td class="num">${fmtEUR(r.ca_propre)}</td><td class="num">${(Number(r.cle_repartition) * 100).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %</td><td class="num">${fmtEUR(r.montant_alloue)}</td></tr>
+      `).join("")}</tbody>`;
+  }
+
+  // ---------- RH & Opérationnel ----------
+
+  function renderRh(d, dbt) {
+    if (!d) return;
+    barChart(document.getElementById("rh-responsables"), d.responsables, {
+      label: (r) => `${r.centre} (${r.responsable})`, value: (r) => Number(r.ca),
+    });
+
+    document.getElementById("rh-rgpd").innerHTML = `
+      <p style="margin:0 0 6px">Champ personnel identifié et anonymisé (Sprint 3) : <code>dim_centre_cout.responsable</code>.</p>
+      <p style="margin:0">Exemple de valeur observée (déjà pseudonymisée, jamais un vrai nom) : <code>${d.responsables[0] ? d.responsables[0].responsable : "—"}</code>. Le rôle « RH » de l'outil de traçabilité ne montre que les tables taguées « Donnée personnelle (RGPD) ».</p>`;
+
+    const p = d.pipeline;
+    const tiles = document.getElementById("rh-pipeline-tiles");
+    tiles.innerHTML = "";
+    tile(tiles, { label: "Ventes CRM", value: fmtNum(p.crm_lignes), infoHref: "../traceability/index.html#stg_crm__fact_ventes_reel" });
+    tile(tiles, { label: "Ventes ERP legacy valides", value: fmtNum(p.erp_valides), infoHref: "../traceability/index.html#stg_erp__fact_ventes_migre" });
+    tile(tiles, { label: "Événements applicatifs (logs)", value: fmtNum(p.logs_events), infoHref: "../traceability/index.html#src_logs_app_events" });
+    tile(tiles, { label: "Lignes budget", value: fmtNum(p.budget_lignes) });
+    tile(tiles, { label: "Lignes forecast", value: fmtNum(p.forecast_lignes) });
+
+    const dbtDiv = document.getElementById("rh-dbt-tests");
+    if (dbt) {
+      const pct = dbt.tests_total ? Math.round((100 * dbt.tests_ok) / dbt.tests_total) : 0;
+      dbtDiv.innerHTML = `
+        <p class="desc">Dernier <code>dbt build</code> : ${dbt.generated_at}</p>
+        <p><span class="status-pill ${dbt.tests_ok === dbt.tests_total ? "good" : "critical"}"><span class="dot"></span>${dbt.tests_ok}/${dbt.tests_total} tests dbt OK</span> · ${dbt.models_total} modèles exécutés (${dbt.models_total + dbt.tests_total} nœuds au total) — ${pct}%</p>`;
+    } else {
+      dbtDiv.innerHTML = `<p class="desc">target/run_results.json introuvable — relancer un <code>dbt build</code>.</p>`;
+    }
+  }
+
+  // ---------- FinOps / Audit ----------
+
+  function renderFinops(d) {
+    const rlsTable = document.getElementById("finops-rls-table");
+    const rlsNote = document.getElementById("finops-rls-note");
+    if (!d || !d.rls_profils || !d.rls_profils.length) {
+      rlsTable.innerHTML = "";
+      rlsNote.textContent = "Non disponible sur cette extraction : clés de service BigQuery introuvables sur la machine ayant régénéré cette page (best-effort, dégradation silencieuse — cohérent avec le reste du portfolio).";
+    } else {
+      rlsTable.innerHTML = `
+        <thead><tr><th>Profil</th><th class="num">Lignes visibles</th><th class="num">SUM montant_reel</th></tr></thead>
+        <tbody>${d.rls_profils.map((r) => {
+          const refuse = r.lignes_visibles === null || r.lignes_visibles === undefined;
+          const pill = r.profil === "rh-viewer"
+            ? `<span class="status-pill good"><span class="dot"></span>accès refusé (attendu)</span>`
+            : `<span class="status-pill good"><span class="dot"></span>accès accordé</span>`;
+          return `<tr><td>${r.profil} ${pill}</td><td class="num">${refuse ? "REFUS (RLS)" : fmtNum(r.lignes_visibles)}</td><td class="num">${r.montant_visible == null ? "REFUS (policy tag)" : fmtEUR(r.montant_visible)}</td></tr>`;
+        }).join("")}</tbody>`;
+      rlsNote.textContent = "rh-viewer : 0 ligne visible (Row-Level Security) ET refus sur la colonne montant_reel (Policy Tag) — deux mécanismes indépendants, tous deux vérifiés par requête réelle.";
+    }
+
+    const tablesTable = document.getElementById("finops-tables-table");
+    const costNote = document.getElementById("finops-cost-note");
+    if (!d || !d.tables_bigquery || !d.tables_bigquery.length) {
+      tablesTable.innerHTML = "";
+      costNote.textContent = "";
+    } else {
+      const totalMb = d.tables_bigquery.reduce((s, t) => s + (t.mb || 0), 0);
+      tablesTable.innerHTML = `
+        <thead><tr><th>Table</th><th class="num">Lignes</th><th class="num">Taille</th><th>Partitionnement</th><th class="num">Rétention</th></tr></thead>
+        <tbody>${d.tables_bigquery.map((t) => `
+          <tr><td>${t.table}</td><td class="num">${fmtNum(t.rows)}</td><td class="num">${t.mb} MB</td><td>${t.partitioned_by ? "mois · " + t.partitioned_by : "—"}</td><td class="num">${t.retention_jours ? t.retention_jours + " j" : "—"}</td></tr>
+        `).join("")}</tbody>`;
+      costNote.textContent = `Stockage total du dataset marts : ${totalMb.toFixed(3)} MB — très en dessous du palier gratuit BigQuery (10 GB stockage / 1 TB requêtes par mois). À ce volume, le coût réel est ≈ 0€ ; le levier FinOps qui compte à cette échelle est le partitionnement/rétention déjà en place (docs/GOUVERNANCE.md), pas la facture actuelle.`;
+    }
+  }
+
+  // ---------- Boot ----------
+
+  renderPdg(DASHBOARD_DATA.pdg);
+  renderCg(DASHBOARD_DATA.cg);
+  renderRh(DASHBOARD_DATA.rh, DASHBOARD_DATA.dbt);
+  renderFinops(DASHBOARD_DATA.finops);
+
+  document.getElementById("footer-generated-at").textContent =
+    (DASHBOARD_DATA.dbt && DASHBOARD_DATA.dbt.generated_at) || "—";
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 # État des lieux
 
-Dernière mise à jour : Sprint 8 terminé (21/08/2026).
+Dernière mise à jour : Sprint 9 terminé (21/08/2026).
 
 ## Avancement
 
@@ -14,7 +14,7 @@ Dernière mise à jour : Sprint 8 terminé (21/08/2026).
 | 6 | Gouvernance avancée & FinOps | ✅ terminé |
 | 7 | MLOps (forecasting, drift, chatbot) | ✅ terminé |
 | 8 | KPI Traçabilité interactive | ✅ terminé |
-| 9 | BI (4 tableaux de bord) | ⬜ à venir |
+| 9 | BI (4 tableaux de bord) | ✅ terminé |
 | 10 | Finition | ⬜ à venir |
 
 Détail sprint par sprint avec les chiffres réels de chaque exécution :
@@ -34,6 +34,7 @@ Détail sprint par sprint avec les chiffres réels de chaque exécution :
 - **CI/CD** : pipeline complet vert sur GitHub Actions à chaque push ; `dbt docs` auto-publié
 - **MLOps** : forecasting Holt (statsmodels) sur `fct_ecarts_reel_budget` → `marts.ml_forecast_reel` ; détection de drift (Evidently AI) sur le flux CRM, 60% des colonnes suivies en dérive entre les deux moitiés chronologiques du jeu de données ; chatbot BI Text-to-SQL (Ollama local + BigQuery, `direction-viewer`, dry_run avant exécution) évalué à **60% d'execution accuracy** (10 questions, vérité terrain) — détail et chiffres complets dans [`docs/MLOPS.md`](docs/MLOPS.md)
 - **Traçabilité KPI** : `traceability/index.html` (repris du prototype solo `projet-14-filiation`), 32 nœuds introspectés depuis `dbt_cg` (11 sources, 10 staging, 11 marts), 107 colonnes avec lignage colonne-à-colonne réel (sqlglot). Nouveau par rapport au prototype : `erp-fiche.html`, fiche ERP legacy cliquable en lecture seule (2 500 lignes, recherche par NUMPCE/CDCLI) liée depuis les nœuds sources `erp_migre` — détail dans [`docs/TRACABILITE-KPI.md`](docs/TRACABILITE-KPI.md)
+- **BI** : `dashboards/index.html`, 4 tableaux de bord HTML/JS maison (Power BI/Looker Studio prévus au départ, mais aucun des deux n'est pilotable par API pour les visuels — modèle sémantique Power BI laissé à Valentin). CA réel 19,1 M€, écart Réel/Budget +1,03 M€, RLS+masking BigQuery prouvés en direct (rh-viewer : 0 ligne + colonne refusée ; Finance/Direction/PDG : 2 240 lignes, 11 847 943,82€), infobulles reliées à la traçabilité du Sprint 8 — détail dans [`docs/BI.md`](docs/BI.md)
 
 ## Dette technique ouverte
 

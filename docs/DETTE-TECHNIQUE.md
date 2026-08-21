@@ -10,12 +10,30 @@ de sprint (voir Definition of Done, `ROADMAP.md`).
 | 2 | `dbt_cg/models/marts/fct_allocation_couts.sql` | Ventile le CA du centre "Non affecté", pas des "charges indirectes" comme prévu au départ — le modèle Réel (`fct_ventes_reel`) ne contient que du chiffre d'affaires, aucune charge réelle n'existe pour être ventilée | Le nom du modèle et l'intitulé roadmap ("allocations de charges") ne correspondent pas exactement à ce qu'il fait | Limite assumée et documentée dans `docs/DBT.md` — nécessiterait un vrai flux "charges réelles" (comptabilité fournisseurs), hors périmètre actuel | Pas de sprint dédié — limite assumée |
 | 3 | `n8n` (`alerting-depassement-budgetaire`, `notification-schema-change`) | Pas de vraie intégration Discord/Slack — s'arrête à un nœud `NoOp` nommé "prêt à brancher" | Aucune alerte n'est réellement envoyée à un humain tant qu'un vrai webhook n'est pas branché | Remplacer le nœud `NoOp` final par un `HTTP Request` vers une vraie URL de webhook (1 nœud) — nécessite un serveur Discord/Slack à brancher | Pas de sprint dédié — dépend d'un compte externe |
 | 4 | `n8n` (`cloture-mensuelle`) | Dépose sur MinIO plutôt que Google Drive comme prévu au cahier des charges — pas de compte Google/OAuth disponible pour ce portfolio | Le fichier XLSX n'atterrit pas réellement sur un Drive partagé | Remplacer le nœud S3 par un nœud Google Drive (même position) une fois un compte disponible | Pas de sprint dédié — dépend d'un compte externe |
-| 5 | `docs/GOUVERNANCE.md` (RLS + Policy Tags) | Appliqués sur 1 seule table (`fct_ecarts_reel_budget`) sur les 11 marts existants — choix de profondeur plutôt que de largeur | Les 10 autres marts (dont `fct_budget`, `fct_forecast`) restent lisibles par n'importe quel principal ayant `bigquery.dataViewer` sur le dataset | Généraliser le même patron (row access policy + policy tag) aux autres tables sensibles — mécanique une fois le patron validé | Sprint 9 (BI), quand les dashboards RH/Finance imposeront un vrai périmètre par profil sur plus de tables |
+| 5 | `docs/GOUVERNANCE.md` (RLS + Policy Tags) | Appliqués sur 1 seule table (`fct_ecarts_reel_budget`) sur les 11 marts existants — choix de profondeur plutôt que de largeur | Les 10 autres marts (dont `fct_budget`, `fct_forecast`) restent lisibles par n'importe quel principal ayant `bigquery.dataViewer` sur le dataset | Généraliser le même patron (row access policy + policy tag) aux autres tables sensibles — mécanique une fois le patron validé | Pas de sprint dédié — **non traité au Sprint 9** malgré la cible initiale : les dashboards PDG/CG/RH lisent Postgres dev (voir `docs/ARCHITECTURE.md` "Écart assumé"), pas BigQuery, donc n'imposent aucun périmètre par profil qui aurait forcé cette généralisation |
 | 6 | Comptes de service `*-viewer` | RH/Finance/Direction/PDG sont des comptes de service, pas de vrais comptes Google Workspace par utilisateur (compte Gmail personnel, pas d'org) | Ne prouve pas qu'un *vrai humain* connecté avec son compte Google verrait le même résultat — seulement que le mécanisme IAM/RLS fonctionne pour des principals distincts | Migrer vers des groupes Google Workspace si ce projet rejoint une organisation avec des comptes utilisateurs réels | Pas de sprint dédié — dépend d'un Workspace, hors de portée d'un compte Gmail perso |
-| 7 | `mlops/chatbot/text_to_sql.py` | Lit toujours BigQuery avec `direction-viewer` (vision complète, non masquée), quelle que soit la question posée — pas de routage RLS par profil comme les comptes de service du Sprint 6 | Un chatbot exposé à un profil RH verrait les mêmes montants confidentiels qu'un profil Direction — aucune notion d'utilisateur/session dans ce portfolio pour router autrement | Ajouter un paramètre de profil à `repondre()`, choisir le client BigQuery en fonction (mécanique, patron déjà posé par `governance/test_acces_par_profil.py`) | Sprint 9 (BI), si un vrai périmètre par profil est exposé côté dashboards |
+| 7 | `mlops/chatbot/text_to_sql.py` | Lit toujours BigQuery avec `direction-viewer` (vision complète, non masquée), quelle que soit la question posée — pas de routage RLS par profil comme les comptes de service du Sprint 6 | Un chatbot exposé à un profil RH verrait les mêmes montants confidentiels qu'un profil Direction — aucune notion d'utilisateur/session dans ce portfolio pour router autrement | Ajouter un paramètre de profil à `repondre()`, choisir le client BigQuery en fonction (mécanique, patron déjà posé par `governance/test_acces_par_profil.py`) | Pas de sprint dédié — **non traité au Sprint 9**, même raison que #5 : le dashboard FinOps/Audit affiche la preuve RLS des 4 profils côte à côte (transparence), il ne route pas encore lui-même une session utilisateur vers un profil unique |
 | 8 | `mlops/drift_detection.py` | Compare les deux moitiés chronologiques du même jeu de données plutôt que deux exécutions Bronze réelles et distinctes | Le score de dérive mesuré n'est pas une vraie dérive de production, juste une preuve que le mécanisme réagit dans le bon sens | Comparer Bronze du jour à Bronze de la veille une fois le pipeline exécuté plusieurs fois dans le temps | Pas de sprint dédié — dépend d'un historique d'exécutions réelles du pipeline (n8n pourrait le déclencher quotidiennement) |
 
-## Résolu ce sprint (Sprint 8)
+## Résolu ce sprint (Sprint 9)
+
+- ~~Pas de tableaux de bord BI~~ → `dashboards/` : 4 tableaux de bord
+  HTML/JS (PDG, Contrôle de gestion, RH & Opérationnel, FinOps/Audit),
+  données réelles (Postgres dev + BigQuery), RLS/masking reprouvés en
+  direct, infobulles reliées à `traceability/` (Sprint 8) via lien profond
+  par hash. Écart d'outillage assumé : Power BI/Looker Studio (prévus dans
+  `docs/ARCHITECTURE.md`) ne sont pas pilotables par API pour l'assemblage
+  des visuels — décidé avec Valentin de construire en HTML/JS maison et de
+  laisser Power BI à Valentin en autonomie
+- ~~"68/68 tests" mal libellé~~ (trouvé en construisant ce sprint) → 68 est
+  le total de nœuds exécutés par le dernier `dbt build` (21 modèles + 47
+  tests), pas 68 tests — `dashboards/index.html` affiche désormais le
+  détail exact (47/47 tests OK, 21 modèles, 68 nœuds au total) ; les
+  mentions historiques "68/68 tests" ailleurs dans le repo restent
+  factuellement vraies (68 exécutions, toutes réussies) mais imprécises,
+  non corrigées partout — cosmétique, pas une priorité
+
+## Résolu Sprint 8 (rappel)
 
 - ~~Pas d'outil de traçabilité KPI~~ → `traceability/` (repris et adapté du
   prototype solo `projet-14-filiation`) : `index.html` introspecté depuis

@@ -184,13 +184,35 @@ Reprise et adaptation du pattern du projet Filiation (portfolio solo,
   et vue Systèmes vides tant que Docker n'est pas démarré au moment de
   l'extraction (dégradation silencieuse, pas un bug).
 
-## Sprint 9 — BI (tableaux de bord)
+## Sprint 9 — BI (tableaux de bord) ✅ terminé
 - TdB Exécutif/PDG : macro-vision, KPIs globaux
 - TdB Contrôle de Gestion : P&L, suivi centres de coûts, écarts Réel vs Budget vs Forecast
 - TdB RH & Opérationnel
 - TdB FinOps/Audit : coûts BigQuery, audit de sécurité (RLS/masking appliqués)
 - Infobulles de documentation vivante, alimentées par l'outil de traçabilité du Sprint 8
 - Connexion RLS testée par profil (un compte "RH" ne voit pas les marges, etc.)
+
+  → tout réalisé, détail complet dans `docs/BI.md`. Écart d'outillage assumé
+  avant de commencer : `docs/ARCHITECTURE.md` prévoyait Power BI/Looker
+  Studio, mais aucun des deux n'est pilotable par API pour l'assemblage des
+  visuels (seule la couche modèle sémantique de Power BI l'est, via le MCP
+  `powerbi-modeling`) — décidé avec Valentin : 4 dashboards HTML/JS maison
+  (`dashboards/`, même patron que `traceability/` du Sprint 8), Power BI
+  laissé à Valentin en autonomie dans un second temps. `scripts/export_dashboard_data.py`
+  interroge Postgres dev (PDG/CG/RH) et BigQuery via les 4 comptes de
+  service `*-viewer` du Sprint 6 (FinOps/RLS) — rien d'inventé. Chiffres
+  réels : CA 19,1 M€, écart Réel/Budget +1,03 M€, RLS+masking reprouvés en
+  direct (rh-viewer 0 ligne + colonne refusée, Finance/Direction/PDG 2 240
+  lignes/11 847 943,82€), stockage BigQuery marts 0,09 MB (sous le palier
+  gratuit). Infobulles ⓘ reliées à `traceability/index.html` via un lien
+  profond par hash ajouté ce sprint. Pas d'entité RH dans `docs/MCD.md` :
+  l'onglet RH & Opérationnel combine pilotage par responsable de centre de
+  coût (champ RGPD anonymisé) et santé du pipeline plutôt que d'inventer des
+  KPIs RH sans source. Vérifié par rendu DOM réel (jsdom). Trou de données
+  réel trouvé et documenté plutôt que masqué : aucune vente Oct-Déc 2024
+  dans le jeu généré, invisible sur le graphique (axe à intervalles
+  réguliers, pas une échelle calendaire) — limite notée dans `docs/BI.md`
+  et sur la page elle-même.
 
 ## Sprint 10 — Finition
 - Dette technique : toutes les lignes de `DETTE-TECHNIQUE.md` soldées ou explicitement actées comme limite assumée
