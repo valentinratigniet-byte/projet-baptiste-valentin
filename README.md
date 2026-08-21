@@ -86,8 +86,8 @@ automatiquement. Détail, limites et résultats réels :
 
 ## Ollama
 
-Modèle `llama3.2:1b` déjà tiré (petit modèle local, suffisant pour prototyper
-le résumé de veille et le chatbot Text-to-SQL des sprints suivants) :
+Modèle `llama3.2:1b` déjà tiré (petit modèle local, suffisant pour le résumé
+de veille et le chatbot Text-to-SQL du Sprint 7, `docs/MLOPS.md`) :
 
 ```bash
 curl http://localhost:11434/api/generate -d '{"model":"llama3.2:1b","prompt":"Bonjour","stream":false}'

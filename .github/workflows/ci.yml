@@ -110,6 +110,11 @@ jobs:
           pip install dbt-core dbt-postgres
           dbt build
 
+      - name: Traçabilité KPI - self-checks + extraction réelle depuis dbt build
+        run: |
+          python traceability/scripts/export_erp_fiches.py --demo
+          python traceability/scripts/extract_filiation.py
+
       - name: MLOps - self-checks (demo(), pas de dépendance BigQuery/Ollama)
         run: |
           python -c "import sys; sys.path.insert(0,'mlops'); import forecast as m; m.demo()"
