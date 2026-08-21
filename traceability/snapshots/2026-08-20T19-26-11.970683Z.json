@@ -1,0 +1,2314 @@
+{
+  "label": "Sprint 8 - premiere extraction",
+  "generated_at": "2026-08-20T19:26:11.970683Z",
+  "nodes": {
+    "src_crm_dim_client": {
+      "domain": "Sources",
+      "type": "raw",
+      "name": "crm_dim_client",
+      "short": "crm_dim_client",
+      "description": "Aucune description renseignée dans dbt (source externe).",
+      "deps": [],
+      "source": {
+        "system": "Postgres — dbt_dev",
+        "table": "raw.crm_dim_client"
+      },
+      "sql": "select\n    id, loaded_at, data\nfrom raw.crm_dim_client",
+      "queryHint": "select * from \"raw\".\"crm_dim_client\" limit 20;",
+      "updateTemplate": "update \"raw\".\"crm_dim_client\"\nset <colonne> = <nouvelle_valeur>\nwhere <condition_precise>;",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "loaded_at",
+          "type": "timestamp with time zone",
+          "tests": []
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "tests": []
+        }
+      ]
+    },
+    "src_crm_dim_produit": {
+      "domain": "Sources",
+      "type": "raw",
+      "name": "crm_dim_produit",
+      "short": "crm_dim_produit",
+      "description": "Aucune description renseignée dans dbt (source externe).",
+      "deps": [],
+      "source": {
+        "system": "Postgres — dbt_dev",
+        "table": "raw.crm_dim_produit"
+      },
+      "sql": "select\n    id, loaded_at, data\nfrom raw.crm_dim_produit",
+      "queryHint": "select * from \"raw\".\"crm_dim_produit\" limit 20;",
+      "updateTemplate": "update \"raw\".\"crm_dim_produit\"\nset <colonne> = <nouvelle_valeur>\nwhere <condition_precise>;",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "loaded_at",
+          "type": "timestamp with time zone",
+          "tests": []
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "tests": []
+        }
+      ]
+    },
+    "src_crm_fact_ventes_reel": {
+      "domain": "Sources",
+      "type": "raw",
+      "name": "crm_fact_ventes_reel",
+      "short": "crm_fact_ventes_reel",
+      "description": "Aucune description renseignée dans dbt (source externe).",
+      "deps": [],
+      "source": {
+        "system": "Postgres — dbt_dev",
+        "table": "raw.crm_fact_ventes_reel"
+      },
+      "sql": "select\n    id, loaded_at, data\nfrom raw.crm_fact_ventes_reel",
+      "queryHint": "select * from \"raw\".\"crm_fact_ventes_reel\" limit 20;",
+      "updateTemplate": "update \"raw\".\"crm_fact_ventes_reel\"\nset <colonne> = <nouvelle_valeur>\nwhere <condition_precise>;",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "loaded_at",
+          "type": "timestamp with time zone",
+          "tests": []
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "tests": []
+        }
+      ]
+    },
+    "src_logs_app_events": {
+      "domain": "Sources",
+      "type": "raw",
+      "name": "logs_app_events",
+      "short": "logs_app_events",
+      "description": "Aucune description renseignée dans dbt (source externe).",
+      "deps": [],
+      "source": {
+        "system": "Postgres — dbt_dev",
+        "table": "raw.logs_app_events"
+      },
+      "sql": "select\n    id, loaded_at, data\nfrom raw.logs_app_events",
+      "queryHint": "select * from \"raw\".\"logs_app_events\" limit 20;",
+      "updateTemplate": "update \"raw\".\"logs_app_events\"\nset <colonne> = <nouvelle_valeur>\nwhere <condition_precise>;",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "loaded_at",
+          "type": "timestamp with time zone",
+          "tests": []
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "tests": []
+        }
+      ]
+    },
+    "src_finance_dim_centre_cout": {
+      "domain": "Sources",
+      "type": "raw",
+      "name": "finance_dim_centre_cout",
+      "short": "finance_dim_centre_cout",
+      "description": "Aucune description renseignée dans dbt (source externe).",
+      "deps": [],
+      "source": {
+        "system": "Postgres — dbt_dev",
+        "table": "raw.finance_dim_centre_cout"
+      },
+      "sql": "select\n    id, loaded_at, data\nfrom raw.finance_dim_centre_cout",
+      "queryHint": "select * from \"raw\".\"finance_dim_centre_cout\" limit 20;",
+      "updateTemplate": "update \"raw\".\"finance_dim_centre_cout\"\nset <colonne> = <nouvelle_valeur>\nwhere <condition_precise>;",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "loaded_at",
+          "type": "timestamp with time zone",
+          "tests": []
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "tests": []
+        }
+      ]
+    },
+    "src_finance_dim_compte": {
+      "domain": "Sources",
+      "type": "raw",
+      "name": "finance_dim_compte",
+      "short": "finance_dim_compte",
+      "description": "Aucune description renseignée dans dbt (source externe).",
+      "deps": [],
+      "source": {
+        "system": "Postgres — dbt_dev",
+        "table": "raw.finance_dim_compte"
+      },
+      "sql": "select\n    id, loaded_at, data\nfrom raw.finance_dim_compte",
+      "queryHint": "select * from \"raw\".\"finance_dim_compte\" limit 20;",
+      "updateTemplate": "update \"raw\".\"finance_dim_compte\"\nset <colonne> = <nouvelle_valeur>\nwhere <condition_precise>;",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "loaded_at",
+          "type": "timestamp with time zone",
+          "tests": []
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "tests": []
+        }
+      ]
+    },
+    "src_finance_dim_version_budget": {
+      "domain": "Sources",
+      "type": "raw",
+      "name": "finance_dim_version_budget",
+      "short": "finance_dim_version_budget",
+      "description": "Aucune description renseignée dans dbt (source externe).",
+      "deps": [],
+      "source": {
+        "system": "Postgres — dbt_dev",
+        "table": "raw.finance_dim_version_budget"
+      },
+      "sql": "select\n    id, loaded_at, data\nfrom raw.finance_dim_version_budget",
+      "queryHint": "select * from \"raw\".\"finance_dim_version_budget\" limit 20;",
+      "updateTemplate": "update \"raw\".\"finance_dim_version_budget\"\nset <colonne> = <nouvelle_valeur>\nwhere <condition_precise>;",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "loaded_at",
+          "type": "timestamp with time zone",
+          "tests": []
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "tests": []
+        }
+      ]
+    },
+    "src_finance_fact_budget": {
+      "domain": "Sources",
+      "type": "raw",
+      "name": "finance_fact_budget",
+      "short": "finance_fact_budget",
+      "description": "Aucune description renseignée dans dbt (source externe).",
+      "deps": [],
+      "source": {
+        "system": "Postgres — dbt_dev",
+        "table": "raw.finance_fact_budget"
+      },
+      "sql": "select\n    id, loaded_at, data\nfrom raw.finance_fact_budget",
+      "queryHint": "select * from \"raw\".\"finance_fact_budget\" limit 20;",
+      "updateTemplate": "update \"raw\".\"finance_fact_budget\"\nset <colonne> = <nouvelle_valeur>\nwhere <condition_precise>;",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "loaded_at",
+          "type": "timestamp with time zone",
+          "tests": []
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "tests": []
+        }
+      ]
+    },
+    "src_finance_fact_forecast": {
+      "domain": "Sources",
+      "type": "raw",
+      "name": "finance_fact_forecast",
+      "short": "finance_fact_forecast",
+      "description": "Aucune description renseignée dans dbt (source externe).",
+      "deps": [],
+      "source": {
+        "system": "Postgres — dbt_dev",
+        "table": "raw.finance_fact_forecast"
+      },
+      "sql": "select\n    id, loaded_at, data\nfrom raw.finance_fact_forecast",
+      "queryHint": "select * from \"raw\".\"finance_fact_forecast\" limit 20;",
+      "updateTemplate": "update \"raw\".\"finance_fact_forecast\"\nset <colonne> = <nouvelle_valeur>\nwhere <condition_precise>;",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "loaded_at",
+          "type": "timestamp with time zone",
+          "tests": []
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "tests": []
+        }
+      ]
+    },
+    "src_fact_ventes_erp_migre": {
+      "domain": "Sources",
+      "type": "raw",
+      "name": "fact_ventes_erp_migre",
+      "short": "fact_ventes_erp_migre",
+      "description": "Aucune description renseignée dans dbt (source externe).",
+      "deps": [],
+      "source": {
+        "system": "Postgres — dbt_dev",
+        "table": "erp_migre.fact_ventes_erp_migre"
+      },
+      "sql": "select\n    numpce, cdcli, client_crm_id_propose, score_matching, methode_matching, centre_cout_libelle, compte_code, date_piece, montant_ht, montant_tva, montant_ttc, ligne_valide, motif_rejet\nfrom erp_migre.fact_ventes_erp_migre",
+      "queryHint": "select * from \"erp_migre\".\"fact_ventes_erp_migre\" limit 20;",
+      "updateTemplate": "update \"erp_migre\".\"fact_ventes_erp_migre\"\nset <colonne> = <nouvelle_valeur>\nwhere <condition_precise>;",
+      "columns": [
+        {
+          "name": "numpce",
+          "type": "character varying(20)",
+          "tests": []
+        },
+        {
+          "name": "cdcli",
+          "type": "character varying(20)",
+          "tests": []
+        },
+        {
+          "name": "client_crm_id_propose",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "score_matching",
+          "type": "numeric",
+          "tests": []
+        },
+        {
+          "name": "methode_matching",
+          "type": "character varying(10)",
+          "tests": []
+        },
+        {
+          "name": "centre_cout_libelle",
+          "type": "character varying(50)",
+          "tests": []
+        },
+        {
+          "name": "compte_code",
+          "type": "character varying(10)",
+          "tests": []
+        },
+        {
+          "name": "date_piece",
+          "type": "date",
+          "tests": []
+        },
+        {
+          "name": "montant_ht",
+          "type": "numeric",
+          "tests": []
+        },
+        {
+          "name": "montant_tva",
+          "type": "numeric",
+          "tests": []
+        },
+        {
+          "name": "montant_ttc",
+          "type": "numeric",
+          "tests": []
+        },
+        {
+          "name": "ligne_valide",
+          "type": "boolean",
+          "tests": []
+        },
+        {
+          "name": "motif_rejet",
+          "type": "character varying(100)",
+          "tests": []
+        }
+      ],
+      "erpFicheHref": "erp-fiche.html?table=fact_ventes_erp_migre"
+    },
+    "src_client_reconciliation": {
+      "domain": "Sources",
+      "type": "raw",
+      "name": "client_reconciliation",
+      "short": "client_reconciliation",
+      "description": "Aucune description renseignée dans dbt (source externe).",
+      "deps": [],
+      "source": {
+        "system": "Postgres — dbt_dev",
+        "table": "erp_migre.client_reconciliation"
+      },
+      "sql": "select\n    cdcli, rscli, client_crm_id_verite, client_crm_id_propose\nfrom erp_migre.client_reconciliation",
+      "queryHint": "select * from \"erp_migre\".\"client_reconciliation\" limit 20;",
+      "updateTemplate": "update \"erp_migre\".\"client_reconciliation\"\nset <colonne> = <nouvelle_valeur>\nwhere <condition_precise>;",
+      "columns": [
+        {
+          "name": "cdcli",
+          "type": "character varying(20)",
+          "tests": []
+        },
+        {
+          "name": "rscli",
+          "type": "character varying(200)",
+          "tests": []
+        },
+        {
+          "name": "client_crm_id_verite",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "client_crm_id_propose",
+          "type": "integer",
+          "tests": []
+        }
+      ],
+      "erpFicheHref": "erp-fiche.html?table=client_reconciliation"
+    },
+    "dim_centre_cout": {
+      "domain": "public_marts",
+      "type": "derived",
+      "name": "dim_centre_cout",
+      "short": "dim_centre_cout",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "stg_finance__dim_centre_cout"
+      ],
+      "materialized": "table",
+      "relation": "dbt_dev.public_marts.dim_centre_cout",
+      "sqlKind": "jinja",
+      "sql": "-- Ajoute un centre \"Non affecté\" synthétique : cible des lignes ERP legacy\n-- dont le CDCC était vide (docs/REFONTE-ERP.md). Sans cette ligne, ces\n-- montants n'auraient aucune clé de jointure valide dans les faits.\nselect * from {{ ref('stg_finance__dim_centre_cout') }}\nunion all\nselect 0 as centre_cout_id, 'CC000' as code, 'Non affecté' as libelle,\n       cast(null as varchar) as responsable, cast(null as int) as centre_parent_id",
+      "queryHint": "select * from \"public_marts\".\"dim_centre_cout\" limit 20;",
+      "filePath": "models/marts/dim_centre_cout.sql",
+      "columns": [
+        {
+          "name": "centre_cout_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            },
+            {
+              "label": "Intégrité référentielle",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "stg_finance__dim_centre_cout",
+              "column": "centre_cout_id"
+            }
+          ]
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__dim_centre_cout",
+              "column": "code"
+            }
+          ]
+        },
+        {
+          "name": "libelle",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__dim_centre_cout",
+              "column": "libelle"
+            }
+          ]
+        },
+        {
+          "name": "responsable",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__dim_centre_cout",
+              "column": "responsable"
+            }
+          ]
+        },
+        {
+          "name": "centre_parent_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__dim_centre_cout",
+              "column": "centre_parent_id"
+            }
+          ]
+        }
+      ]
+    },
+    "dim_compte": {
+      "domain": "public_marts",
+      "type": "derived",
+      "name": "dim_compte",
+      "short": "dim_compte",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "stg_finance__dim_compte"
+      ],
+      "materialized": "table",
+      "relation": "dbt_dev.public_marts.dim_compte",
+      "sqlKind": "jinja",
+      "sql": "select * from {{ ref('stg_finance__dim_compte') }}",
+      "queryHint": "select * from \"public_marts\".\"dim_compte\" limit 20;",
+      "filePath": "models/marts/dim_compte.sql",
+      "columns": [
+        {
+          "name": "compte_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            },
+            {
+              "label": "Intégrité référentielle",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "stg_finance__dim_compte",
+              "column": "compte_id"
+            }
+          ]
+        },
+        {
+          "name": "code_compte",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__dim_compte",
+              "column": "code_compte"
+            }
+          ]
+        },
+        {
+          "name": "libelle",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__dim_compte",
+              "column": "libelle"
+            }
+          ]
+        },
+        {
+          "name": "nature",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__dim_compte",
+              "column": "nature"
+            }
+          ]
+        }
+      ]
+    },
+    "dim_date": {
+      "domain": "public_marts",
+      "type": "derived",
+      "name": "dim_date",
+      "short": "dim_date",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [],
+      "materialized": "table",
+      "relation": "dbt_dev.public_marts.dim_date",
+      "sqlKind": "jinja",
+      "sql": "-- Spine de dates via generate_series (natif Postgres, pas besoin de\n-- dbt_utils pour une seule table). Couvre large (2023 pour l'ERP legacy,\n-- jusqu'à fin du forecast 2027).\nwith jours as (\n    select generate_series('2023-01-01'::date, '2027-12-31'::date, '1 day'::interval)::date as date\n)\nselect\n    date,\n    extract(year from date)::int as annee,\n    extract(month from date)::int as mois,\n    extract(quarter from date)::int as trimestre,\n    date_trunc('month', date)::date as premier_jour_mois\nfrom jours",
+      "queryHint": "select * from \"public_marts\".\"dim_date\" limit 20;",
+      "filePath": "models/marts/dim_date.sql",
+      "columns": [
+        {
+          "name": "date",
+          "type": "date",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            }
+          ]
+        },
+        {
+          "name": "annee",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "mois",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "trimestre",
+          "type": "integer",
+          "tests": []
+        },
+        {
+          "name": "premier_jour_mois",
+          "type": "date",
+          "tests": []
+        }
+      ]
+    },
+    "dim_produit": {
+      "domain": "public_marts",
+      "type": "derived",
+      "name": "dim_produit",
+      "short": "dim_produit",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "stg_crm__dim_produit"
+      ],
+      "materialized": "table",
+      "relation": "dbt_dev.public_marts.dim_produit",
+      "sqlKind": "jinja",
+      "sql": "select * from {{ ref('stg_crm__dim_produit') }}",
+      "queryHint": "select * from \"public_marts\".\"dim_produit\" limit 20;",
+      "filePath": "models/marts/dim_produit.sql",
+      "columns": [
+        {
+          "name": "produit_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "stg_crm__dim_produit",
+              "column": "produit_id"
+            }
+          ]
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_crm__dim_produit",
+              "column": "code"
+            }
+          ]
+        },
+        {
+          "name": "libelle",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_crm__dim_produit",
+              "column": "libelle"
+            }
+          ]
+        },
+        {
+          "name": "famille",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_crm__dim_produit",
+              "column": "famille"
+            }
+          ]
+        }
+      ]
+    },
+    "dim_version_budget": {
+      "domain": "public_marts",
+      "type": "derived",
+      "name": "dim_version_budget",
+      "short": "dim_version_budget",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "stg_finance__dim_version_budget"
+      ],
+      "materialized": "table",
+      "relation": "dbt_dev.public_marts.dim_version_budget",
+      "sqlKind": "jinja",
+      "sql": "select * from {{ ref('stg_finance__dim_version_budget') }}",
+      "queryHint": "select * from \"public_marts\".\"dim_version_budget\" limit 20;",
+      "filePath": "models/marts/dim_version_budget.sql",
+      "columns": [
+        {
+          "name": "version_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__dim_version_budget",
+              "column": "version_id"
+            }
+          ]
+        },
+        {
+          "name": "libelle",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__dim_version_budget",
+              "column": "libelle"
+            }
+          ]
+        },
+        {
+          "name": "date_validation",
+          "type": "date",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__dim_version_budget",
+              "column": "date_validation"
+            }
+          ]
+        }
+      ]
+    },
+    "fct_allocation_couts": {
+      "domain": "public_marts",
+      "type": "derived",
+      "name": "fct_allocation_couts",
+      "short": "fct_allocation_couts",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "fct_ventes_reel",
+        "fct_ventes_reel"
+      ],
+      "materialized": "table",
+      "relation": "dbt_dev.public_marts.fct_allocation_couts",
+      "sqlKind": "jinja",
+      "sql": "-- Allocations analytiques : répartit les montants du centre \"Non affecté\"\n-- (CDCC vide dans l'ERP legacy, cf. docs/REFONTE-ERP.md) vers les centres\n-- commerciaux réels, au prorata de leur part de CA — clé de répartition\n-- classique en contrôle de gestion.\n--\n-- Limite assumée : le cahier des charges visait des \"charges indirectes\",\n-- mais fct_ventes_reel (l'unique fait \"Réel\" du modèle) ne contient que du\n-- chiffre d'affaires, pas de charges réelles (seul le Budget en a, cf.\n-- fct_ecarts_reel_budget). Il n'existe donc aucune charge réelle à\n-- ventiler : ce modèle ventile le CA non affecté, pas des charges. Le\n-- mécanisme (clé de répartition au prorata) est le même ; l'objet réparti\n-- diffère de l'intitulé d'origine — assumé plutôt que masqué.\n\nwith ca_par_centre as (\n    select centre_cout_id, sum(montant_reel) as ca\n    from {{ ref('fct_ventes_reel') }}\n    where centre_cout_id != 0\n    group by 1\n),\n\ntotal_ca as (\n    select sum(ca) as total from ca_par_centre\n),\n\nnon_affecte as (\n    select sum(montant_reel) as montant_a_ventiler\n    from {{ ref('fct_ventes_reel') }}\n    where centre_cout_id = 0\n)\n\nselect\n    c.centre_cout_id,\n    c.ca as ca_propre,\n    round(c.ca / t.total, 4) as cle_repartition,\n    round(n.montant_a_ventiler * c.ca / t.total, 2) as montant_alloue\nfrom ca_par_centre c\ncross join total_ca t\ncross join non_affecte n\norder by montant_alloue desc",
+      "queryHint": "select * from \"public_marts\".\"fct_allocation_couts\" limit 20;",
+      "filePath": "models/marts/fct_allocation_couts.sql",
+      "columns": [
+        {
+          "name": "centre_cout_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "fct_ventes_reel",
+              "column": "centre_cout_id"
+            }
+          ]
+        },
+        {
+          "name": "ca_propre",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "fct_ventes_reel",
+              "column": "montant_reel"
+            }
+          ]
+        },
+        {
+          "name": "cle_repartition",
+          "type": "numeric",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "fct_ventes_reel",
+              "column": "montant_reel"
+            }
+          ]
+        },
+        {
+          "name": "montant_alloue",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "fct_ventes_reel",
+              "column": "montant_reel"
+            }
+          ]
+        }
+      ]
+    },
+    "fct_budget": {
+      "domain": "public_marts",
+      "type": "derived",
+      "name": "fct_budget",
+      "short": "fct_budget",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "stg_finance__fact_budget"
+      ],
+      "materialized": "table",
+      "relation": "dbt_dev.public_marts.fct_budget",
+      "sqlKind": "jinja",
+      "sql": "select * from {{ ref('stg_finance__fact_budget') }}",
+      "queryHint": "select * from \"public_marts\".\"fct_budget\" limit 20;",
+      "filePath": "models/marts/fct_budget.sql",
+      "columns": [
+        {
+          "name": "budget_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__fact_budget",
+              "column": "budget_id"
+            }
+          ]
+        },
+        {
+          "name": "periode",
+          "type": "date",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__fact_budget",
+              "column": "periode"
+            }
+          ]
+        },
+        {
+          "name": "centre_cout_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__fact_budget",
+              "column": "centre_cout_id"
+            }
+          ]
+        },
+        {
+          "name": "compte_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__fact_budget",
+              "column": "compte_id"
+            }
+          ]
+        },
+        {
+          "name": "version_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__fact_budget",
+              "column": "version_id"
+            }
+          ]
+        },
+        {
+          "name": "montant_budget",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__fact_budget",
+              "column": "montant_budget"
+            }
+          ]
+        }
+      ]
+    },
+    "fct_ecarts_reel_budget": {
+      "domain": "public_marts",
+      "type": "derived",
+      "name": "fct_ecarts_reel_budget",
+      "short": "fct_ecarts_reel_budget",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "fct_ventes_reel",
+        "fct_budget"
+      ],
+      "materialized": "table",
+      "relation": "dbt_dev.public_marts.fct_ecarts_reel_budget",
+      "sqlKind": "jinja",
+      "sql": "-- Le point clé du MCD (docs/MCD.md) : le Réel est transactionnel (jour),\n-- le Budget est mensuel par (centre_cout, compte). On agrège le Réel au\n-- grain du Budget avant de les rapprocher.\n\nwith reel_mensuel as (\n    select\n        date_trunc('month', date_vente)::date as periode,\n        centre_cout_id,\n        compte_id,\n        sum(montant_reel) as montant_reel\n    from {{ ref('fct_ventes_reel') }}\n    group by 1, 2, 3\n),\n\nbudget as (\n    select periode, centre_cout_id, compte_id, montant_budget\n    from {{ ref('fct_budget') }}\n)\n\nselect\n    coalesce(r.periode, b.periode) as periode,\n    coalesce(r.centre_cout_id, b.centre_cout_id) as centre_cout_id,\n    coalesce(r.compte_id, b.compte_id) as compte_id,\n    r.montant_reel,\n    b.montant_budget,\n    r.montant_reel - b.montant_budget as ecart,\n    case when b.montant_budget is not null and b.montant_budget != 0\n         then round(100.0 * (r.montant_reel - b.montant_budget) / b.montant_budget, 1)\n         end as ecart_pct\nfrom reel_mensuel r\nfull outer join budget b\n    on r.periode = b.periode\n   and r.centre_cout_id = b.centre_cout_id\n   and r.compte_id = b.compte_id",
+      "queryHint": "select * from \"public_marts\".\"fct_ecarts_reel_budget\" limit 20;",
+      "filePath": "models/marts/fct_ecarts_reel_budget.sql",
+      "columns": [
+        {
+          "name": "periode",
+          "type": "date",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "fct_ventes_reel",
+              "column": "date_vente"
+            },
+            {
+              "node": "fct_budget",
+              "column": "periode"
+            }
+          ]
+        },
+        {
+          "name": "centre_cout_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "fct_budget",
+              "column": "centre_cout_id"
+            },
+            {
+              "node": "fct_ventes_reel",
+              "column": "centre_cout_id"
+            }
+          ]
+        },
+        {
+          "name": "compte_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "fct_ventes_reel",
+              "column": "compte_id"
+            },
+            {
+              "node": "fct_budget",
+              "column": "compte_id"
+            }
+          ]
+        },
+        {
+          "name": "montant_reel",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "fct_ventes_reel",
+              "column": "montant_reel"
+            }
+          ]
+        },
+        {
+          "name": "montant_budget",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "fct_budget",
+              "column": "montant_budget"
+            }
+          ]
+        },
+        {
+          "name": "ecart",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "fct_budget",
+              "column": "montant_budget"
+            },
+            {
+              "node": "fct_ventes_reel",
+              "column": "montant_reel"
+            }
+          ]
+        },
+        {
+          "name": "ecart_pct",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "fct_budget",
+              "column": "montant_budget"
+            },
+            {
+              "node": "fct_ventes_reel",
+              "column": "montant_reel"
+            }
+          ]
+        }
+      ]
+    },
+    "fct_forecast": {
+      "domain": "public_marts",
+      "type": "derived",
+      "name": "fct_forecast",
+      "short": "fct_forecast",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "stg_finance__fact_forecast"
+      ],
+      "materialized": "table",
+      "relation": "dbt_dev.public_marts.fct_forecast",
+      "sqlKind": "jinja",
+      "sql": "select * from {{ ref('stg_finance__fact_forecast') }}",
+      "queryHint": "select * from \"public_marts\".\"fct_forecast\" limit 20;",
+      "filePath": "models/marts/fct_forecast.sql",
+      "columns": [
+        {
+          "name": "forecast_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__fact_forecast",
+              "column": "forecast_id"
+            }
+          ]
+        },
+        {
+          "name": "periode_cible",
+          "type": "date",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__fact_forecast",
+              "column": "periode_cible"
+            }
+          ]
+        },
+        {
+          "name": "date_revision",
+          "type": "date",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__fact_forecast",
+              "column": "date_revision"
+            }
+          ]
+        },
+        {
+          "name": "centre_cout_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__fact_forecast",
+              "column": "centre_cout_id"
+            }
+          ]
+        },
+        {
+          "name": "compte_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__fact_forecast",
+              "column": "compte_id"
+            }
+          ]
+        },
+        {
+          "name": "montant_forecast",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_finance__fact_forecast",
+              "column": "montant_forecast"
+            }
+          ]
+        }
+      ]
+    },
+    "fct_ventes_reel": {
+      "domain": "public_marts",
+      "type": "derived",
+      "name": "fct_ventes_reel",
+      "short": "fct_ventes_reel",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "stg_crm__fact_ventes_reel",
+        "dim_compte",
+        "stg_erp__fact_ventes_migre",
+        "dim_centre_cout"
+      ],
+      "materialized": "table",
+      "relation": "dbt_dev.public_marts.fct_ventes_reel",
+      "sqlKind": "jinja",
+      "sql": "-- Union CRM + ERP legacy migré, colonne `source` conservée pour traçabilité\n-- (engagement pris dans docs/REFONTE-ERP.md §3 Phase 5).\n--\n-- Limite assumée (dette technique) : le plan comptable ERP (CDCPT, style\n-- PCG à 6 chiffres : 706100/707000/758000) n'a jamais été mappé compte par\n-- compte vers le plan cible (dim_compte, codes 4 chiffres inventés pour ce\n-- portfolio) — une vraie migration produirait cette table de correspondance\n-- complète. Ici, les 3 codes CDCPT observés sont tous des comptes de vente\n-- (cf. diagnostic ERP), donc mappés vers l'unique compte \"Ventes produits\"\n-- du CRM. Pas de perte d'information sur le sens (vente), une perte de\n-- granularité analytique (706100 vs 707000 vs 758000) assumée.\n\nwith ventes_crm as (\n    select\n        vente_id::varchar as id_ligne,\n        date_vente,\n        centre_cout_id,\n        compte_id,\n        produit_id,\n        client_id,\n        montant_reel,\n        source\n    from {{ ref('stg_crm__fact_ventes_reel') }}\n),\n\ncompte_ventes as (\n    select compte_id from {{ ref('dim_compte') }} where libelle = 'Ventes produits'\n),\n\nventes_erp as (\n    select\n        e.numpce as id_ligne,\n        e.date_piece as date_vente,\n        coalesce(cc.centre_cout_id, 0) as centre_cout_id,\n        cv.compte_id,\n        cast(null as int) as produit_id,  -- l'ERP legacy ne détaille pas le produit\n        e.client_crm_id_propose as client_id,\n        e.montant_ht as montant_reel,\n        e.source\n    from {{ ref('stg_erp__fact_ventes_migre') }} e\n    left join {{ ref('dim_centre_cout') }} cc on cc.libelle = e.centre_cout_libelle\n    cross join compte_ventes cv\n)\n\nselect * from ventes_crm\nunion all\nselect * from ventes_erp",
+      "queryHint": "select * from \"public_marts\".\"fct_ventes_reel\" limit 20;",
+      "filePath": "models/marts/fct_ventes_reel.sql",
+      "columns": [
+        {
+          "name": "id_ligne",
+          "type": "character varying",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "stg_crm__fact_ventes_reel",
+              "column": "vente_id"
+            },
+            {
+              "node": "stg_erp__fact_ventes_migre",
+              "column": "numpce"
+            }
+          ]
+        },
+        {
+          "name": "date_vente",
+          "type": "date",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_crm__fact_ventes_reel",
+              "column": "date_vente"
+            },
+            {
+              "node": "stg_erp__fact_ventes_migre",
+              "column": "date_piece"
+            }
+          ]
+        },
+        {
+          "name": "centre_cout_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Intégrité référentielle",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "stg_crm__fact_ventes_reel",
+              "column": "centre_cout_id"
+            },
+            {
+              "node": "dim_centre_cout",
+              "column": "centre_cout_id"
+            }
+          ]
+        },
+        {
+          "name": "compte_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Intégrité référentielle",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "stg_crm__fact_ventes_reel",
+              "column": "compte_id"
+            },
+            {
+              "node": "dim_compte",
+              "column": "compte_id"
+            }
+          ]
+        },
+        {
+          "name": "produit_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_crm__fact_ventes_reel",
+              "column": "produit_id"
+            }
+          ]
+        },
+        {
+          "name": "client_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_crm__fact_ventes_reel",
+              "column": "client_id"
+            },
+            {
+              "node": "stg_erp__fact_ventes_migre",
+              "column": "client_crm_id_propose"
+            }
+          ]
+        },
+        {
+          "name": "montant_reel",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_crm__fact_ventes_reel",
+              "column": "montant_reel"
+            },
+            {
+              "node": "stg_erp__fact_ventes_migre",
+              "column": "montant_ht"
+            }
+          ]
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "tests": [
+            {
+              "label": "Valeurs autorisées : CRM, ERP_LEGACY",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "stg_crm__fact_ventes_reel",
+              "column": "source"
+            },
+            {
+              "node": "stg_erp__fact_ventes_migre",
+              "column": "source"
+            }
+          ]
+        }
+      ]
+    },
+    "stg_crm__dim_produit": {
+      "domain": "public_staging",
+      "type": "derived",
+      "name": "stg_crm__dim_produit",
+      "short": "stg_crm__dim_produit",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "src_crm_dim_produit"
+      ],
+      "materialized": "view",
+      "relation": "dbt_dev.public_staging.stg_crm__dim_produit",
+      "sqlKind": "jinja",
+      "sql": "select\n    (data->>'produit_id')::int as produit_id,\n    data->>'code' as code,\n    data->>'libelle' as libelle,\n    data->>'famille' as famille\nfrom {{ source('raw', 'crm_dim_produit') }}",
+      "queryHint": "select * from \"public_staging\".\"stg_crm__dim_produit\" limit 20;",
+      "filePath": "models/staging/stg_crm__dim_produit.sql",
+      "columns": [
+        {
+          "name": "produit_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            },
+            {
+              "label": "Intégrité référentielle",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_crm_dim_produit",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_crm_dim_produit",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "libelle",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_crm_dim_produit",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "famille",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_crm_dim_produit",
+              "column": "data"
+            }
+          ]
+        }
+      ]
+    },
+    "stg_finance__dim_centre_cout": {
+      "domain": "public_staging",
+      "type": "derived",
+      "name": "stg_finance__dim_centre_cout",
+      "short": "stg_finance__dim_centre_cout",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "src_finance_dim_centre_cout"
+      ],
+      "materialized": "view",
+      "relation": "dbt_dev.public_staging.stg_finance__dim_centre_cout",
+      "sqlKind": "jinja",
+      "sql": "select\n    (data->>'centre_cout_id')::int as centre_cout_id,\n    data->>'code' as code,\n    data->>'libelle' as libelle,\n    data->>'responsable' as responsable,\n    (data->>'centre_parent_id')::int as centre_parent_id\nfrom {{ source('raw', 'finance_dim_centre_cout') }}",
+      "queryHint": "select * from \"public_staging\".\"stg_finance__dim_centre_cout\" limit 20;",
+      "filePath": "models/staging/stg_finance__dim_centre_cout.sql",
+      "columns": [
+        {
+          "name": "centre_cout_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            },
+            {
+              "label": "Intégrité référentielle",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_finance_dim_centre_cout",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_dim_centre_cout",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "libelle",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_dim_centre_cout",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "responsable",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_dim_centre_cout",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "centre_parent_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_dim_centre_cout",
+              "column": "data"
+            }
+          ]
+        }
+      ]
+    },
+    "stg_finance__dim_compte": {
+      "domain": "public_staging",
+      "type": "derived",
+      "name": "stg_finance__dim_compte",
+      "short": "stg_finance__dim_compte",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "src_finance_dim_compte"
+      ],
+      "materialized": "view",
+      "relation": "dbt_dev.public_staging.stg_finance__dim_compte",
+      "sqlKind": "jinja",
+      "sql": "select\n    (data->>'compte_id')::int as compte_id,\n    data->>'code_compte' as code_compte,\n    data->>'libelle' as libelle,\n    data->>'nature' as nature\nfrom {{ source('raw', 'finance_dim_compte') }}",
+      "queryHint": "select * from \"public_staging\".\"stg_finance__dim_compte\" limit 20;",
+      "filePath": "models/staging/stg_finance__dim_compte.sql",
+      "columns": [
+        {
+          "name": "compte_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            },
+            {
+              "label": "Intégrité référentielle",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_finance_dim_compte",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "code_compte",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_dim_compte",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "libelle",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_dim_compte",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "nature",
+          "type": "text",
+          "tests": [
+            {
+              "label": "Valeurs autorisées : charge, produit",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_finance_dim_compte",
+              "column": "data"
+            }
+          ]
+        }
+      ]
+    },
+    "stg_finance__dim_version_budget": {
+      "domain": "public_staging",
+      "type": "derived",
+      "name": "stg_finance__dim_version_budget",
+      "short": "stg_finance__dim_version_budget",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "src_finance_dim_version_budget"
+      ],
+      "materialized": "view",
+      "relation": "dbt_dev.public_staging.stg_finance__dim_version_budget",
+      "sqlKind": "jinja",
+      "sql": "select\n    (data->>'version_id')::int as version_id,\n    data->>'libelle' as libelle,\n    (data->>'date_validation')::date as date_validation\nfrom {{ source('raw', 'finance_dim_version_budget') }}",
+      "queryHint": "select * from \"public_staging\".\"stg_finance__dim_version_budget\" limit 20;",
+      "filePath": "models/staging/stg_finance__dim_version_budget.sql",
+      "columns": [
+        {
+          "name": "version_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_dim_version_budget",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "libelle",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_dim_version_budget",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "date_validation",
+          "type": "date",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_dim_version_budget",
+              "column": "data"
+            }
+          ]
+        }
+      ]
+    },
+    "stg_finance__fact_budget": {
+      "domain": "public_staging",
+      "type": "derived",
+      "name": "stg_finance__fact_budget",
+      "short": "stg_finance__fact_budget",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "src_finance_fact_budget"
+      ],
+      "materialized": "view",
+      "relation": "dbt_dev.public_staging.stg_finance__fact_budget",
+      "sqlKind": "jinja",
+      "sql": "select\n    (data->>'budget_id')::int as budget_id,\n    (data->>'periode')::date as periode,\n    (data->>'centre_cout_id')::int as centre_cout_id,\n    (data->>'compte_id')::int as compte_id,\n    (data->>'version_id')::int as version_id,\n    (data->>'montant_budget')::numeric as montant_budget\nfrom {{ source('raw', 'finance_fact_budget') }}",
+      "queryHint": "select * from \"public_staging\".\"stg_finance__fact_budget\" limit 20;",
+      "filePath": "models/staging/stg_finance__fact_budget.sql",
+      "columns": [
+        {
+          "name": "budget_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_finance_fact_budget",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "periode",
+          "type": "date",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_fact_budget",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "centre_cout_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Intégrité référentielle",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_finance_fact_budget",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "compte_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Intégrité référentielle",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_finance_fact_budget",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "version_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_fact_budget",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "montant_budget",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_fact_budget",
+              "column": "data"
+            }
+          ]
+        }
+      ]
+    },
+    "stg_finance__fact_forecast": {
+      "domain": "public_staging",
+      "type": "derived",
+      "name": "stg_finance__fact_forecast",
+      "short": "stg_finance__fact_forecast",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "src_finance_fact_forecast"
+      ],
+      "materialized": "view",
+      "relation": "dbt_dev.public_staging.stg_finance__fact_forecast",
+      "sqlKind": "jinja",
+      "sql": "select\n    (data->>'forecast_id')::int as forecast_id,\n    (data->>'periode_cible')::date as periode_cible,\n    (data->>'date_revision')::date as date_revision,\n    (data->>'centre_cout_id')::int as centre_cout_id,\n    (data->>'compte_id')::int as compte_id,\n    (data->>'montant_forecast')::numeric as montant_forecast\nfrom {{ source('raw', 'finance_fact_forecast') }}",
+      "queryHint": "select * from \"public_staging\".\"stg_finance__fact_forecast\" limit 20;",
+      "filePath": "models/staging/stg_finance__fact_forecast.sql",
+      "columns": [
+        {
+          "name": "forecast_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_finance_fact_forecast",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "periode_cible",
+          "type": "date",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_fact_forecast",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "date_revision",
+          "type": "date",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_fact_forecast",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "centre_cout_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_fact_forecast",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "compte_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_fact_forecast",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "montant_forecast",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_finance_fact_forecast",
+              "column": "data"
+            }
+          ]
+        }
+      ]
+    },
+    "stg_logs__app_events": {
+      "domain": "public_staging",
+      "type": "derived",
+      "name": "stg_logs__app_events",
+      "short": "stg_logs__app_events",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "src_logs_app_events"
+      ],
+      "materialized": "view",
+      "relation": "dbt_dev.public_staging.stg_logs__app_events",
+      "sqlKind": "jinja",
+      "sql": "select\n    (data->>'timestamp')::timestamp as event_ts,\n    data->>'event_type' as event_type,\n    data->>'niveau' as niveau,\n    (data->>'client_id')::int as client_id,\n    data->>'session_id' as session_id,\n    (data->>'produit_id')::int as produit_id\nfrom {{ source('raw', 'logs_app_events') }}",
+      "queryHint": "select * from \"public_staging\".\"stg_logs__app_events\" limit 20;",
+      "filePath": "models/staging/stg_logs__app_events.sql",
+      "columns": [
+        {
+          "name": "event_ts",
+          "type": "timestamp without time zone",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_logs_app_events",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "event_type",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_logs_app_events",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "niveau",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_logs_app_events",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "client_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_logs_app_events",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "session_id",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_logs_app_events",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "produit_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_logs_app_events",
+              "column": "data"
+            }
+          ]
+        }
+      ]
+    },
+    "stg_crm__dim_client": {
+      "domain": "public_staging",
+      "type": "derived",
+      "name": "stg_crm__dim_client",
+      "short": "stg_crm__dim_client",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "src_crm_dim_client"
+      ],
+      "materialized": "view",
+      "relation": "dbt_dev.public_staging.stg_crm__dim_client",
+      "sqlKind": "jinja",
+      "sql": "select\n    (data->>'client_id')::int as client_id,\n    data->>'code' as code,\n    data->>'libelle' as libelle,\n    data->>'segment' as segment,\n    data->>'siret' as siret\nfrom {{ source('raw', 'crm_dim_client') }}",
+      "queryHint": "select * from \"public_staging\".\"stg_crm__dim_client\" limit 20;",
+      "filePath": "models/staging/stg_crm__dim_client.sql",
+      "columns": [
+        {
+          "name": "client_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Intégrité référentielle",
+              "status": "ok"
+            },
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_crm_dim_client",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_crm_dim_client",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "libelle",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_crm_dim_client",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "segment",
+          "type": "text",
+          "tests": [
+            {
+              "label": "Valeurs autorisées : Grand compte, PME, Particulier, Revendeur",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_crm_dim_client",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "siret",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_crm_dim_client",
+              "column": "data"
+            }
+          ]
+        }
+      ]
+    },
+    "stg_crm__fact_ventes_reel": {
+      "domain": "public_staging",
+      "type": "derived",
+      "name": "stg_crm__fact_ventes_reel",
+      "short": "stg_crm__fact_ventes_reel",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "src_crm_fact_ventes_reel"
+      ],
+      "materialized": "view",
+      "relation": "dbt_dev.public_staging.stg_crm__fact_ventes_reel",
+      "sqlKind": "jinja",
+      "sql": "select\n    (data->>'vente_id')::int as vente_id,\n    (data->>'date')::date as date_vente,\n    (data->>'centre_cout_id')::int as centre_cout_id,\n    (data->>'compte_id')::int as compte_id,\n    (data->>'produit_id')::int as produit_id,\n    (data->>'client_id')::int as client_id,\n    (data->>'montant_reel')::numeric as montant_reel,\n    (data->>'quantite')::int as quantite,\n    'CRM' as source\nfrom {{ source('raw', 'crm_fact_ventes_reel') }}",
+      "queryHint": "select * from \"public_staging\".\"stg_crm__fact_ventes_reel\" limit 20;",
+      "filePath": "models/staging/stg_crm__fact_ventes_reel.sql",
+      "columns": [
+        {
+          "name": "vente_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_crm_fact_ventes_reel",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "date_vente",
+          "type": "date",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_crm_fact_ventes_reel",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "centre_cout_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_crm_fact_ventes_reel",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "compte_id",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_crm_fact_ventes_reel",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "produit_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Intégrité référentielle",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_crm_fact_ventes_reel",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "client_id",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Intégrité référentielle",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_crm_fact_ventes_reel",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "montant_reel",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_crm_fact_ventes_reel",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "quantite",
+          "type": "integer",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_crm_fact_ventes_reel",
+              "column": "data"
+            }
+          ]
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "tests": []
+        }
+      ]
+    },
+    "stg_erp__fact_ventes_migre": {
+      "domain": "public_staging",
+      "type": "derived",
+      "name": "stg_erp__fact_ventes_migre",
+      "short": "stg_erp__fact_ventes_migre",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "src_fact_ventes_erp_migre"
+      ],
+      "materialized": "view",
+      "relation": "dbt_dev.public_staging.stg_erp__fact_ventes_migre",
+      "sqlKind": "jinja",
+      "sql": "-- Passthrough quasi 1:1 : erp_migre est déjà typé (chargé directement en\n-- Postgres par erp-legacy/migrate_erp_to_target.py, Sprint 2). La\n-- résolution centre_cout_libelle/compte_code -> IDs cible se fait dans\n-- marts/fct_ventes_reel.sql (logique métier, pas du staging).\nselect\n    numpce,\n    cdcli,\n    client_crm_id_propose,\n    score_matching,\n    centre_cout_libelle,\n    compte_code,\n    date_piece,\n    montant_ht,\n    'ERP_LEGACY' as source\nfrom {{ source('erp_migre', 'fact_ventes_erp_migre') }}\nwhere ligne_valide = true\n  and client_crm_id_propose is not null  -- seules les lignes réconciliées à un client CRM entrent dans le fait unifié",
+      "queryHint": "select * from \"public_staging\".\"stg_erp__fact_ventes_migre\" limit 20;",
+      "filePath": "models/staging/stg_erp__fact_ventes_migre.sql",
+      "columns": [
+        {
+          "name": "numpce",
+          "type": "character varying(20)",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_fact_ventes_erp_migre",
+              "column": "numpce"
+            }
+          ]
+        },
+        {
+          "name": "cdcli",
+          "type": "character varying(20)",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_fact_ventes_erp_migre",
+              "column": "cdcli"
+            }
+          ]
+        },
+        {
+          "name": "client_crm_id_propose",
+          "type": "integer",
+          "tests": [
+            {
+              "label": "Intégrité référentielle",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "src_fact_ventes_erp_migre",
+              "column": "client_crm_id_propose"
+            }
+          ]
+        },
+        {
+          "name": "score_matching",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_fact_ventes_erp_migre",
+              "column": "score_matching"
+            }
+          ]
+        },
+        {
+          "name": "centre_cout_libelle",
+          "type": "character varying(50)",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_fact_ventes_erp_migre",
+              "column": "centre_cout_libelle"
+            }
+          ]
+        },
+        {
+          "name": "compte_code",
+          "type": "character varying(10)",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_fact_ventes_erp_migre",
+              "column": "compte_code"
+            }
+          ]
+        },
+        {
+          "name": "date_piece",
+          "type": "date",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_fact_ventes_erp_migre",
+              "column": "date_piece"
+            }
+          ]
+        },
+        {
+          "name": "montant_ht",
+          "type": "numeric",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "src_fact_ventes_erp_migre",
+              "column": "montant_ht"
+            }
+          ]
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "tests": []
+        }
+      ]
+    },
+    "dim_client": {
+      "domain": "public_marts",
+      "type": "derived",
+      "name": "dim_client",
+      "short": "dim_client",
+      "description": "Aucune description renseignée dans dbt.",
+      "deps": [
+        "stg_crm__dim_client",
+        "src_client_reconciliation"
+      ],
+      "materialized": "table",
+      "relation": "dbt_dev.public_marts.dim_client",
+      "sqlKind": "jinja",
+      "sql": "-- MDM / golden record : fusionne le référentiel CRM (source de vérité) avec\n-- les clients legacy jamais réconciliés (client_crm_id_propose NULL dans\n-- erp_migre.client_reconciliation -> soit un vrai client jamais repris dans\n-- le CRM, soit un faux négatif du matching, cf. docs/REFONTE-ERP.md §4).\n-- Ces clients legacy-only reçoivent un nouvel ID (10000+) : ils n'existaient\n-- dans aucun référentiel cible avant cette fusion.\n\nwith crm as (\n    select\n        client_id,\n        code,\n        libelle,\n        segment,\n        siret,\n        'CRM' as source\n    from {{ ref('stg_crm__dim_client') }}\n),\n\nlegacy_non_reconcilies as (\n    select distinct on (rscli)\n        rscli,\n        cdcli\n    from {{ source('erp_migre', 'client_reconciliation') }}\n    where client_crm_id_propose is null\n    order by rscli, cdcli\n),\n\nlegacy_golden as (\n    select\n        10000 + row_number() over (order by cdcli) as client_id,\n        cdcli as code,\n        rscli as libelle,\n        cast(null as varchar) as segment,\n        cast(null as varchar) as siret,\n        'ERP_LEGACY_ONLY' as source\n    from legacy_non_reconcilies\n)\n\nselect * from crm\nunion all\nselect * from legacy_golden",
+      "queryHint": "select * from \"public_marts\".\"dim_client\" limit 20;",
+      "filePath": "models/marts/dim_client.sql",
+      "columns": [
+        {
+          "name": "client_id",
+          "type": "bigint",
+          "tests": [
+            {
+              "label": "Valeurs non nulles",
+              "status": "ok"
+            },
+            {
+              "label": "Unicité",
+              "status": "ok"
+            }
+          ],
+          "upstream": [
+            {
+              "node": "stg_crm__dim_client",
+              "column": "client_id"
+            },
+            {
+              "node": "src_client_reconciliation",
+              "column": "cdcli"
+            }
+          ]
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_crm__dim_client",
+              "column": "code"
+            },
+            {
+              "node": "src_client_reconciliation",
+              "column": "cdcli"
+            }
+          ]
+        },
+        {
+          "name": "libelle",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_crm__dim_client",
+              "column": "libelle"
+            },
+            {
+              "node": "src_client_reconciliation",
+              "column": "rscli"
+            }
+          ]
+        },
+        {
+          "name": "segment",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_crm__dim_client",
+              "column": "segment"
+            }
+          ]
+        },
+        {
+          "name": "siret",
+          "type": "text",
+          "tests": [],
+          "upstream": [
+            {
+              "node": "stg_crm__dim_client",
+              "column": "siret"
+            }
+          ]
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "tests": [
+            {
+              "label": "Valeurs autorisées : CRM, ERP_LEGACY_ONLY",
+              "status": "ok"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

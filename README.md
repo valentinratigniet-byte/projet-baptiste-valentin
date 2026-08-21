@@ -16,6 +16,7 @@ et du DataOps d'une entreprise multi-millions d'euros, stack 100% gratuite.
 - [`docs/GOUVERNANCE.md`](docs/GOUVERNANCE.md) — RLS + Policy Tags BigQuery, prouvés par requête réelle
 - [`docs/SECRETS-CHECKLIST.md`](docs/SECRETS-CHECKLIST.md) — rotation des secrets avant exposition réseau
 - [`docs/MLOPS.md`](docs/MLOPS.md) — forecasting, détection de drift, chatbot BI Text-to-SQL
+- [`docs/TRACABILITE-KPI.md`](docs/TRACABILITE-KPI.md) — outil interactif de traçabilité KPI + fiche ERP native
 - **Doc dbt en ligne** : https://valentinratigniet-byte.github.io/projet-baptiste-valentin/
 
 ## Démarrer l'infra locale
@@ -149,6 +150,14 @@ service (RH/Finance/Direction/PDG) — RH voit 0 ligne et se fait refuser la
 colonne sensible, les 3 autres voient tout. Détail complet, chiffres réels,
 3 root causes trouvées en route (dont un 3ᵉ piège SSL, côté gRPC) :
 [`docs/GOUVERNANCE.md`](docs/GOUVERNANCE.md).
+
+## Traçabilité KPI
+
+Ouvrir [`traceability/index.html`](traceability/index.html) (aucune
+dépendance, aucun serveur) : clic sur n'importe quelle source/colonne/modèle
+→ remonte le lignage jusqu'à la donnée brute, plus une fiche ERP native en
+lecture seule pour les tables issues de la migration Sprint 2. Régénérer
+après un `dbt run`/`dbt test` : voir [`docs/TRACABILITE-KPI.md`](docs/TRACABILITE-KPI.md).
 
 ## CI/CD
 

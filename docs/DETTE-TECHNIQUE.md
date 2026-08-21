@@ -15,7 +15,16 @@ de sprint (voir Definition of Done, `ROADMAP.md`).
 | 7 | `mlops/chatbot/text_to_sql.py` | Lit toujours BigQuery avec `direction-viewer` (vision complète, non masquée), quelle que soit la question posée — pas de routage RLS par profil comme les comptes de service du Sprint 6 | Un chatbot exposé à un profil RH verrait les mêmes montants confidentiels qu'un profil Direction — aucune notion d'utilisateur/session dans ce portfolio pour router autrement | Ajouter un paramètre de profil à `repondre()`, choisir le client BigQuery en fonction (mécanique, patron déjà posé par `governance/test_acces_par_profil.py`) | Sprint 9 (BI), si un vrai périmètre par profil est exposé côté dashboards |
 | 8 | `mlops/drift_detection.py` | Compare les deux moitiés chronologiques du même jeu de données plutôt que deux exécutions Bronze réelles et distinctes | Le score de dérive mesuré n'est pas une vraie dérive de production, juste une preuve que le mécanisme réagit dans le bon sens | Comparer Bronze du jour à Bronze de la veille une fois le pipeline exécuté plusieurs fois dans le temps | Pas de sprint dédié — dépend d'un historique d'exécutions réelles du pipeline (n8n pourrait le déclencher quotidiennement) |
 
-## Résolu ce sprint (Sprint 7)
+## Résolu ce sprint (Sprint 8)
+
+- ~~Pas d'outil de traçabilité KPI~~ → `traceability/` (repris et adapté du
+  prototype solo `projet-14-filiation`) : `index.html` introspecté depuis
+  `dbt_cg` (32 nœuds, 107 colonnes avec lignage colonne-à-colonne sqlglot),
+  `erp-fiche.html` (nouveau vs le prototype solo) — fiche ERP legacy
+  cliquable en lecture seule liée depuis les nœuds sources `erp_migre`, sans
+  aucune écriture possible depuis l'outil
+
+## Résolu Sprint 7 (rappel)
 
 - ~~Pas de forecasting métier~~ → `mlops/forecast.py`, lissage de Holt (`statsmodels`), 3 séries prévues sur 6 (le reste ignoré faute d'historique suffisant, pas forcé), écrit `marts.ml_forecast_reel`
 - ~~Pas de détection de drift~~ → `mlops/drift_detection.py` (Evidently AI), 60% des colonnes suivies en dérive mesuré sur le flux CRM (limite : un seul run, dette #8 ci-dessus)

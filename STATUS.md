@@ -1,6 +1,6 @@
 # État des lieux
 
-Dernière mise à jour : Sprint 7 terminé (20/08/2026).
+Dernière mise à jour : Sprint 8 terminé (21/08/2026).
 
 ## Avancement
 
@@ -13,7 +13,7 @@ Dernière mise à jour : Sprint 7 terminé (20/08/2026).
 | 5 | Hub n8n (reverse ETL, alerting, veille) | ✅ terminé |
 | 6 | Gouvernance avancée & FinOps | ✅ terminé |
 | 7 | MLOps (forecasting, drift, chatbot) | ✅ terminé |
-| 8 | KPI Traçabilité interactive | ⬜ à venir |
+| 8 | KPI Traçabilité interactive | ✅ terminé |
 | 9 | BI (4 tableaux de bord) | ⬜ à venir |
 | 10 | Finition | ⬜ à venir |
 
@@ -33,6 +33,7 @@ Détail sprint par sprint avec les chiffres réels de chaque exécution :
 - **Gouvernance BigQuery** : RLS + Policy Tags sur `fct_ecarts_reel_budget`, **prouvés par requête réelle** avec 4 comptes de service — RH : 0 ligne + colonne refusée, Finance/Direction/PDG : 2 240 lignes, 11 847 943,82€
 - **CI/CD** : pipeline complet vert sur GitHub Actions à chaque push ; `dbt docs` auto-publié
 - **MLOps** : forecasting Holt (statsmodels) sur `fct_ecarts_reel_budget` → `marts.ml_forecast_reel` ; détection de drift (Evidently AI) sur le flux CRM, 60% des colonnes suivies en dérive entre les deux moitiés chronologiques du jeu de données ; chatbot BI Text-to-SQL (Ollama local + BigQuery, `direction-viewer`, dry_run avant exécution) évalué à **60% d'execution accuracy** (10 questions, vérité terrain) — détail et chiffres complets dans [`docs/MLOPS.md`](docs/MLOPS.md)
+- **Traçabilité KPI** : `traceability/index.html` (repris du prototype solo `projet-14-filiation`), 32 nœuds introspectés depuis `dbt_cg` (11 sources, 10 staging, 11 marts), 107 colonnes avec lignage colonne-à-colonne réel (sqlglot). Nouveau par rapport au prototype : `erp-fiche.html`, fiche ERP legacy cliquable en lecture seule (2 500 lignes, recherche par NUMPCE/CDCLI) liée depuis les nœuds sources `erp_migre` — détail dans [`docs/TRACABILITE-KPI.md`](docs/TRACABILITE-KPI.md)
 
 ## Dette technique ouverte
 

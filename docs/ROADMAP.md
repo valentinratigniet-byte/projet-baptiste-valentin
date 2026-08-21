@@ -151,9 +151,9 @@ seulement de la génération de données propres.
   par profil, détection de drift sur un seul run (`docs/DETTE-TECHNIQUE.md`
   #9/#10).
 
-## Sprint 8 — KPI Traçabilité interactive
-Nouvelle fonctionnalité : reprise et adaptation du pattern du projet
-Filiation (portfolio solo, `projet-14-filiation`) à ce projet binôme.
+## Sprint 8 — KPI Traçabilité interactive ✅ terminé
+Reprise et adaptation du pattern du projet Filiation (portfolio solo,
+`projet-14-filiation`) à ce projet binôme.
 - Page interactive (HTML/CSS/JS vanilla, sans dépendance) : clic sur
   n'importe quel indicateur/colonne/table → remonte sa formule/SQL jusqu'à
   la donnée brute et sa source
@@ -164,6 +164,25 @@ Filiation (portfolio solo, `projet-14-filiation`) à ce projet binôme.
   **jamais d'édition directe** (gouvernance lecture-seule déjà actée sur le
   reste du portfolio)
 - Couverture : au minimum les KPIs des 4 dashboards du Sprint 9
+
+  → tout réalisé, détail complet dans `docs/TRACABILITE-KPI.md`.
+  `traceability/` (nouveau dossier, calqué sur `projet-14-filiation`) :
+  `index.html` (32 nœuds — 11 sources + 10 staging + 11 marts, 53 tests dbt
+  affichés au niveau colonne, 107 colonnes avec lignage colonne-à-colonne
+  résolu par sqlglot), `scripts/extract_filiation.py` (adapté : cible
+  `dbt_cg/target`, libellés de couche `public_staging`/`public_marts`,
+  lecture des credentials Postgres par variables d'environnement plutôt que
+  `profiles.yml` qui utilise des `{{ env_var(...) }}` Jinja sur ce projet).
+  Nouveau par rapport au prototype solo : `erp-fiche.html` +
+  `scripts/export_erp_fiches.py`, une vraie fiche ERP legacy cliquable
+  (recherche par NUMPCE/CDCLI, lecture seule stricte) alimentée par les
+  2 500 lignes de `erp-legacy/exports/ERP_EXPORT_VTE_2023_2024.csv`, liée
+  depuis les deux nœuds sources `erp_migre`. Vérifié par rendu DOM réel
+  (`jsdom`, pas seulement `node --check`) sur les deux pages avant d'être
+  considéré terminé — pratique reprise du prototype solo après une
+  régression passée du même type. Limite assumée : comptage de lignes réel
+  et vue Systèmes vides tant que Docker n'est pas démarré au moment de
+  l'extraction (dégradation silencieuse, pas un bug).
 
 ## Sprint 9 — BI (tableaux de bord)
 - TdB Exécutif/PDG : macro-vision, KPIs globaux
