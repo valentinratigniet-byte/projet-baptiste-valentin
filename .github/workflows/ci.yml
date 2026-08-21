@@ -109,6 +109,7 @@ jobs:
         run: |
           pip install dbt-core dbt-postgres
           dbt build
+          dbt docs generate
 
       - name: Traçabilité KPI - self-checks + extraction réelle depuis dbt build
         run: |
