@@ -109,3 +109,13 @@ jobs:
         run: |
           pip install dbt-core dbt-postgres
           dbt build
+
+      - name: MLOps - self-checks (demo(), pas de dépendance BigQuery/Ollama)
+        run: |
+          python -c "import sys; sys.path.insert(0,'mlops'); import forecast as m; m.demo()"
+          python -c "import sys; sys.path.insert(0,'mlops'); import drift_detection as m; m.demo()"
+          python -c "import sys; sys.path.insert(0,'mlops/chatbot'); import text_to_sql as m; m.demo()"
+          python -c "import sys; sys.path.insert(0,'mlops/chatbot'); import eval_chatbot as m; m.demo()"
+
+      - name: MLOps - détection de drift (lit le staging dbt de ce run, aucune dépendance externe)
+        run: python mlops/drift_detection.py

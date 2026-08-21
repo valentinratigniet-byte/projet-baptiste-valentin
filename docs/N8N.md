@@ -64,8 +64,11 @@ pointe du marché."
 ```
 
 Générique plutôt que vraiment ancré dans les titres Hacker News collectés —
-limite assumée d'un modèle 1B. Un modèle plus gros (Sprint 7, chatbot
-Text-to-SQL) donnera un résultat plus exploitable.
+limite assumée d'un modèle 1B. Piste testée au Sprint 7 (chatbot
+Text-to-SQL) : un modèle plus gros (`llama3.2:3b`) donne des réponses plus
+justes mais prend 169s par question sur ce matériel (CPU seul, pas de GPU
+passé au conteneur) contre 1-3s pour le 1B — inutilisable en interactif.
+Le 1B a été gardé, voir `docs/MLOPS.md`.
 
 ## Réconciliation client : le SIRET change la donne (dette #5/#6)
 

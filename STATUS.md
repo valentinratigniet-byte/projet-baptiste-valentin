@@ -1,6 +1,6 @@
 # État des lieux
 
-Dernière mise à jour : Sprint 6 terminé (20/08/2026).
+Dernière mise à jour : Sprint 7 terminé (20/08/2026).
 
 ## Avancement
 
@@ -12,7 +12,7 @@ Dernière mise à jour : Sprint 6 terminé (20/08/2026).
 | 4 | Entrepôt & transformation dbt | ✅ terminé |
 | 5 | Hub n8n (reverse ETL, alerting, veille) | ✅ terminé |
 | 6 | Gouvernance avancée & FinOps | ✅ terminé |
-| 7 | MLOps (forecasting, drift, chatbot) | ⬜ à venir |
+| 7 | MLOps (forecasting, drift, chatbot) | ✅ terminé |
 | 8 | KPI Traçabilité interactive | ⬜ à venir |
 | 9 | BI (4 tableaux de bord) | ⬜ à venir |
 | 10 | Finition | ⬜ à venir |
@@ -32,13 +32,15 @@ Détail sprint par sprint avec les chiffres réels de chaque exécution :
 - **MDM** : réconciliation client SIRET + fuzzy-match — précision 80,2% (F1 89,0%)
 - **Gouvernance BigQuery** : RLS + Policy Tags sur `fct_ecarts_reel_budget`, **prouvés par requête réelle** avec 4 comptes de service — RH : 0 ligne + colonne refusée, Finance/Direction/PDG : 2 240 lignes, 11 847 943,82€
 - **CI/CD** : pipeline complet vert sur GitHub Actions à chaque push ; `dbt docs` auto-publié
+- **MLOps** : forecasting Holt (statsmodels) sur `fct_ecarts_reel_budget` → `marts.ml_forecast_reel` ; détection de drift (Evidently AI) sur le flux CRM, 60% des colonnes suivies en dérive entre les deux moitiés chronologiques du jeu de données ; chatbot BI Text-to-SQL (Ollama local + BigQuery, `direction-viewer`, dry_run avant exécution) évalué à **60% d'execution accuracy** (10 questions, vérité terrain) — détail et chiffres complets dans [`docs/MLOPS.md`](docs/MLOPS.md)
 
 ## Dette technique ouverte
 
-Voir [`docs/DETTE-TECHNIQUE.md`](docs/DETTE-TECHNIQUE.md) — 6 lignes
+Voir [`docs/DETTE-TECHNIQUE.md`](docs/DETTE-TECHNIQUE.md) — 8 lignes
 ouvertes à ce stade (RLS/masking limité à 1 table sur 11 par choix de
 profondeur, intégrations Discord/Slack/Drive en placeholder faute de
-compte externe, etc.), chacune avec son plafond connu. Rien n'est caché :
+compte externe, chatbot sans routage RLS par profil, détection de drift
+sur un seul run, etc.), chacune avec son plafond connu. Rien n'est caché :
 plusieurs root causes ont été trouvées et corrigées en cours de route
 plutôt que contournées — dont trois pièges SSL différents sur trois piles
 réseau distinctes (OpenSSL, Node.js, gRPC) et une collision de variable

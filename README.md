@@ -15,6 +15,7 @@ et du DataOps d'une entreprise multi-millions d'euros, stack 100% gratuite.
 - [`docs/N8N.md`](docs/N8N.md) — les 5 workflows, réconciliation SIRET, piège SSL Node.js
 - [`docs/GOUVERNANCE.md`](docs/GOUVERNANCE.md) — RLS + Policy Tags BigQuery, prouvés par requête réelle
 - [`docs/SECRETS-CHECKLIST.md`](docs/SECRETS-CHECKLIST.md) — rotation des secrets avant exposition réseau
+- [`docs/MLOPS.md`](docs/MLOPS.md) — forecasting, détection de drift, chatbot BI Text-to-SQL
 - **Doc dbt en ligne** : https://valentinratigniet-byte.github.io/projet-baptiste-valentin/
 
 ## Démarrer l'infra locale

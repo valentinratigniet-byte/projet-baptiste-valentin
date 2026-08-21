@@ -10,3 +10,4 @@ logs/
 *.log
 data-generation/output/
 erp-legacy/exports/
+mlops/reports/*.html

@@ -125,11 +125,31 @@ seulement de la génération de données propres.
   `GRPC_CA_BUNDLE`), convention de région Data Catalog (`eu` minuscule vs
   `EU` BigQuery).
 
-## Sprint 7 — MLOps
+## Sprint 7 — MLOps ✅ terminé
 - Forecasting métier (Python, séries temporelles sur `fct_ecarts_reel_budget`)
 - Détection de data drift (Evidently AI) sur les flux Bronze/Silver
 - Chatbot BI Text-to-SQL : Ollama local interrogeant BigQuery en lecture seule
 - Évaluation du chatbot sur un jeu de questions/réponses métier avec vérité terrain
+
+  → tout réalisé, détail complet dans `docs/MLOPS.md` : `mlops/forecast.py`
+  (lissage de Holt, `statsmodels`) prévoit 3 mois sur les séries avec assez
+  d'historique (3 prévues / 6, le reste ignoré plutôt que forcé) et écrit
+  `marts.ml_forecast_reel` ; `mlops/drift_detection.py` (Evidently AI) mesure
+  **60% des colonnes suivies en dérive** entre les deux moitiés
+  chronologiques du flux CRM (pas encore deux runs réels distincts à
+  comparer — limite assumée) et publie un rapport HTML ; `mlops/chatbot/`
+  génère du SQL via Ollama local, le valide (liste blanche de
+  tables/commandes, dry_run BigQuery avant toute exécution) puis l'exécute
+  en lecture seule (`direction-viewer`, plafond FinOps). Évalué à **60%
+  d'execution accuracy** (10 questions, vérité terrain, comparaison par
+  résultat exécuté plutôt que par texte SQL) après ajout d'un exemple
+  few-shot au prompt (30% en zero-shot). `llama3.2:3b` testé pour remplacer
+  le 1B (piste annoncée au Sprint 5) : plus juste mais 169s par question sur
+  ce matériel CPU-only contre 1-3s pour le 1B, jugé inutilisable en
+  interactif — le 1B est resté le modèle du chatbot, choix documenté plutôt
+  que silencieusement abandonné. Dette ajoutée : chatbot sans routage RLS
+  par profil, détection de drift sur un seul run (`docs/DETTE-TECHNIQUE.md`
+  #9/#10).
 
 ## Sprint 8 — KPI Traçabilité interactive
 Nouvelle fonctionnalité : reprise et adaptation du pattern du projet

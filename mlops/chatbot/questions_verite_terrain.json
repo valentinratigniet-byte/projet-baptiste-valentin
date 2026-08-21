@@ -1,0 +1,42 @@
+[
+  {
+    "question": "Quel est le libellé du centre de coût numéro 1 ?",
+    "sql_reference": "SELECT libelle FROM marts.dim_centre_cout WHERE centre_cout_id = 1"
+  },
+  {
+    "question": "Combien de centres de coût existe-t-il au total ?",
+    "sql_reference": "SELECT COUNT(*) AS n FROM marts.dim_centre_cout"
+  },
+  {
+    "question": "Quel est le montant réel total sur tous les centres de coût ?",
+    "sql_reference": "SELECT SUM(montant_reel) AS total FROM marts.fct_ecarts_reel_budget"
+  },
+  {
+    "question": "Quel est le montant budget total ?",
+    "sql_reference": "SELECT SUM(montant_budget) AS total FROM marts.fct_ecarts_reel_budget"
+  },
+  {
+    "question": "Quelle est la période la plus récente disponible dans les écarts réel/budget ?",
+    "sql_reference": "SELECT MAX(periode) AS derniere_periode FROM marts.fct_ecarts_reel_budget"
+  },
+  {
+    "question": "Combien de lignes contient la table des écarts réel/budget ?",
+    "sql_reference": "SELECT COUNT(*) AS n FROM marts.fct_ecarts_reel_budget"
+  },
+  {
+    "question": "Quel est l'écart moyen en pourcentage entre réel et budget ?",
+    "sql_reference": "SELECT AVG(ecart_pct) AS ecart_moyen_pct FROM marts.fct_ecarts_reel_budget"
+  },
+  {
+    "question": "Combien de comptes distincts sont utilisés dans les écarts réel/budget ?",
+    "sql_reference": "SELECT COUNT(DISTINCT compte_id) AS n FROM marts.fct_ecarts_reel_budget"
+  },
+  {
+    "question": "Quelle est la première période disponible dans les écarts réel/budget ?",
+    "sql_reference": "SELECT MIN(periode) AS premiere_periode FROM marts.fct_ecarts_reel_budget"
+  },
+  {
+    "question": "Quel est le libellé du centre de coût dont la somme des écarts est la plus élevée ?",
+    "sql_reference": "SELECT dc.libelle FROM marts.fct_ecarts_reel_budget fe JOIN marts.dim_centre_cout dc ON fe.centre_cout_id = dc.centre_cout_id GROUP BY dc.libelle ORDER BY SUM(fe.ecart) DESC LIMIT 1"
+  }
+]
