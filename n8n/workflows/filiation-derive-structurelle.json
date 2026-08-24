@@ -1,0 +1,104 @@
+{
+  "name": "Filiation - derive structurelle bv-postgres-dbtdev",
+  "nodes": [
+    {
+      "id": "trig1",
+      "name": "Declenchement",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        300
+      ],
+      "webhookId": "c4d5e6f7-8a9b-4c0d-9e1f-2a3b4c5d6e7f",
+      "parameters": {
+        "path": "trigger-filiation-derive",
+        "httpMethod": "POST",
+        "responseMode": "onReceived",
+        "options": {}
+      }
+    },
+    {
+      "id": "pg1",
+      "name": "Compter les tables (erp_migre, public_marts, raw)",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) AS n_tables FROM information_schema.tables WHERE table_schema IN ('erp_migre', 'public_marts', 'raw')",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "R6wveCCfUaQdMMKM",
+          "name": "Postgres dbt-dev"
+        }
+      }
+    },
+    {
+      "id": "code1",
+      "name": "Comparer au dernier scan Filiation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// Dernier compte connu lors du dernier scan_database.py --merge sur projet-14-filiation\n// (18e-19e commit, 2026-08-21 : erp_migre + public_marts + raw = 23 tables). A mettre a\n// jour manuellement apres chaque nouvelle extraction reelle -- ce workflow ne peut pas\n// ecrire dans index.html lui-meme (pas d'acces au poste de Valentin depuis ce conteneur),\n// il se contente de signaler qu'une extraction manuelle est probablement necessaire.\nconst BASELINE = 23;\n\nconst total = Number($input.first().json.n_tables);\nconst drifted = total !== BASELINE;\nconst message = drifted\n  ? `\\u26a0\\ufe0f Filiation : derive structurelle detectee sur bv-postgres-dbtdev (erp_migre/public_marts/raw) \\u2014 ${total} table(s) au lieu de ${BASELINE} attendues lors du dernier scan_database.py. Rejouer 'python scripts/scan_database.py --merge' sur projet-14-filiation, puis committer index.html.`\n  : `\\u2705 Filiation : structure de bv-postgres-dbtdev inchangee (${total} table(s), conforme au dernier scan du ${BASELINE === total ? '21/08' : '?'}).`;\n\nreturn [{ json: { total, baseline: BASELINE, drifted, message } }];"
+      }
+    },
+    {
+      "id": "noop1",
+      "name": "Alerte prete si drifted=true (brancher GitHub Issue sur projet-14-filiation ici)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        920,
+        300
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Declenchement": {
+      "main": [
+        [
+          {
+            "node": "Compter les tables (erp_migre, public_marts, raw)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compter les tables (erp_migre, public_marts, raw)": {
+      "main": [
+        [
+          {
+            "node": "Comparer au dernier scan Filiation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comparer au dernier scan Filiation": {
+      "main": [
+        [
+          {
+            "node": "Alerte prete si drifted=true (brancher GitHub Issue sur projet-14-filiation ici)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {}
+}
