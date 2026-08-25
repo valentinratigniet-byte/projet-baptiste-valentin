@@ -220,6 +220,25 @@ Reprise et adaptation du pattern du projet Filiation (portfolio solo,
 - README final, `docs/REFONTE-ERP.md` et outil de traçabilité liés depuis l'index
 - `git init` + publication GitHub (à valider avant tout push)
 
+  → tout réalisé. `git init`/publication GitHub déjà faits depuis le
+  Sprint 1, rien à refaire. `docs/REFONTE-ERP.md` et
+  `traceability/index.html` étaient déjà liés dans le README — vérifié
+  plutôt que supposé. Deux sections manquaient réellement (MLOps, Power
+  BI) : ajoutées. `tests/test_e2e_pipeline.py` créé et **exécuté** (pas
+  juste écrit) : rejoue tout le pipeline sur les services Docker locaux,
+  vert du premier coup — 35 403 lignes source → Bronze, `dbt build`
+  47/47 tests, marts non vides, fichier XLSX réellement déposé sur MinIO
+  par le webhook `cloture-mensuelle` (reverse ETL). `DETTE-TECHNIQUE.md` :
+  10 lignes, toutes explicitement actées comme limite assumée avec
+  plafond connu (aucune "soldée" ce sprint — les 8 dettes précédentes
+  dépendent toutes d'un compte externe ou d'un choix de profondeur déjà
+  documenté ; 2 nouvelles ajoutées en construisant le rapport Power BI
+  du Sprint 9/10, dette #9 et #10 : RLS testée localement sans vrai
+  multi-utilisateur, pas d'OLS native). Piège trouvé en route : la carte
+  de démo RLS FinOps affichait `(Vide)` au lieu de `0` pour le rôle RH —
+  `COUNTROWS` sous un filtre `FALSE()` renvoie `BLANK`, pas `0` en DAX ;
+  corrigé (`+0`), documenté dans `docs/BI-POWERBI.md`.
+
 ## Definition of Done par sprint
 - Mise à jour de `DETTE-TECHNIQUE.md` (ajout des nouveaux raccourcis, retrait de ceux réellement soldés)
 - Pas de secret en dur (voir `.env.example`)

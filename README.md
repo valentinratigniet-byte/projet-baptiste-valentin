@@ -18,6 +18,7 @@ et du DataOps d'une entreprise multi-millions d'euros, stack 100% gratuite.
 - [`docs/MLOPS.md`](docs/MLOPS.md) — forecasting, détection de drift, chatbot BI Text-to-SQL
 - [`docs/TRACABILITE-KPI.md`](docs/TRACABILITE-KPI.md) — outil interactif de traçabilité KPI + fiche ERP native
 - [`docs/BI.md`](docs/BI.md) — 4 tableaux de bord (PDG, CG, RH, FinOps), preuve RLS/masking en direct
+- [`docs/BI-POWERBI.md`](docs/BI-POWERBI.md) — rapport Power BI Pilotage CG, modèle sémantique, RLS testée
 - **Doc dbt en ligne** : https://valentinratigniet-byte.github.io/projet-baptiste-valentin/
 
 ## Démarrer l'infra locale
@@ -152,6 +153,18 @@ colonne sensible, les 3 autres voient tout. Détail complet, chiffres réels,
 3 root causes trouvées en route (dont un 3ᵉ piège SSL, côté gRPC) :
 [`docs/GOUVERNANCE.md`](docs/GOUVERNANCE.md).
 
+## MLOps (forecasting, drift, chatbot BI)
+
+```bash
+./.venv/Scripts/python.exe mlops/forecast.py            # -> marts.ml_forecast_reel
+./.venv/Scripts/python.exe mlops/drift_detection.py      # -> mlops/reports/drift_report.html
+./.venv/Scripts/python.exe mlops/chatbot/text_to_sql.py  # chatbot Text-to-SQL interactif (Ollama + BigQuery)
+```
+
+Lissage de Holt sur `fct_ecarts_reel_budget`, détection de drift (Evidently
+AI), chatbot Text-to-SQL avec dry_run avant exécution. Chiffres réels et
+limites (dette #8) : [`docs/MLOPS.md`](docs/MLOPS.md).
+
 ## Traçabilité KPI
 
 Ouvrir [`traceability/index.html`](traceability/index.html) (aucune
@@ -167,6 +180,27 @@ aucun serveur) : 4 onglets (Exécutif/PDG, Contrôle de gestion, RH &
 Opérationnel, FinOps/Audit), données réelles régénérées par
 `dashboards/scripts/export_dashboard_data.py`. Détail et chiffres complets :
 [`docs/BI.md`](docs/BI.md).
+
+## Rapport Power BI
+
+`dashboards/powerbi/dbt_cg.pbix` (rapport **Pilotage CG**, 4 pages :
+Vue direction, Contrôle de gestion, RH & Opérationnel, FinOps/Audit).
+Modèle sémantique construit avec Valentin (14 tables, 17 mesures DAX,
+RLS 4 rôles testée par requête réelle), visuels conçus par Valentin.
+Captures dans `dashboards/powerbi/outputs/`, détail complet dans
+[`docs/BI-POWERBI.md`](docs/BI-POWERBI.md).
+
+## Tests end-to-end
+
+```bash
+./.venv/Scripts/python.exe tests/test_e2e_pipeline.py
+```
+
+Rejoue tout le pipeline (source → Bronze → raw → Gold dbt → BI → reverse
+ETL n8n) sur les services Docker locaux et vérifie le résultat réel à
+chaque étape (lignes chargées, `dbt build` 47/47 tests, marts non vides,
+fichier XLSX effectivement déposé sur MinIO par le webhook n8n) — pas
+seulement que les commandes rendent la main sans erreur.
 
 ## CI/CD
 

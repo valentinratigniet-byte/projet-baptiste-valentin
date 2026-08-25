@@ -14,8 +14,27 @@ de sprint (voir Definition of Done, `ROADMAP.md`).
 | 6 | Comptes de service `*-viewer` | RH/Finance/Direction/PDG sont des comptes de service, pas de vrais comptes Google Workspace par utilisateur (compte Gmail personnel, pas d'org) | Ne prouve pas qu'un *vrai humain* connecté avec son compte Google verrait le même résultat — seulement que le mécanisme IAM/RLS fonctionne pour des principals distincts | Migrer vers des groupes Google Workspace si ce projet rejoint une organisation avec des comptes utilisateurs réels | Pas de sprint dédié — dépend d'un Workspace, hors de portée d'un compte Gmail perso |
 | 7 | `mlops/chatbot/text_to_sql.py` | Lit toujours BigQuery avec `direction-viewer` (vision complète, non masquée), quelle que soit la question posée — pas de routage RLS par profil comme les comptes de service du Sprint 6 | Un chatbot exposé à un profil RH verrait les mêmes montants confidentiels qu'un profil Direction — aucune notion d'utilisateur/session dans ce portfolio pour router autrement | Ajouter un paramètre de profil à `repondre()`, choisir le client BigQuery en fonction (mécanique, patron déjà posé par `governance/test_acces_par_profil.py`) | Pas de sprint dédié — **non traité au Sprint 9**, même raison que #5 : le dashboard FinOps/Audit affiche la preuve RLS des 4 profils côte à côte (transparence), il ne route pas encore lui-même une session utilisateur vers un profil unique |
 | 8 | `mlops/drift_detection.py` | Compare les deux moitiés chronologiques du même jeu de données plutôt que deux exécutions Bronze réelles et distinctes | Le score de dérive mesuré n'est pas une vraie dérive de production, juste une preuve que le mécanisme réagit dans le bon sens | Comparer Bronze du jour à Bronze de la veille une fois le pipeline exécuté plusieurs fois dans le temps | Pas de sprint dédié — dépend d'un historique d'exécutions réelles du pipeline (n8n pourrait le déclencher quotidiennement) |
+| 9 | `dashboards/powerbi/dbt_cg.pbix` (RLS) | La RLS des 4 rôles n'est prouvée que via **Modélisation → Afficher en tant que** dans Power BI Desktop (l'auteur simule le rôle) | Ne prouve pas qu'un *autre* utilisateur connecté avec son propre compte verrait le même résultat — même limite de principe que la dette #6 côté BigQuery | Publier sur le service Power BI et assigner des comptes réels aux 4 rôles | Pas de sprint dédié — nécessite un compte Power BI Pro/tenant, hors périmètre solo |
+| 10 | `dashboards/powerbi/dbt_cg.pbix` (RLS) | Pas d'OLS (masquage de colonne) native — seul `montant_reel` devrait être caché à RH en gardant le reste visible, comme le Policy Tag BigQuery | RH voit de toute façon 0 ligne sur `Fct Écarts Réel-Budget` donc l'effet pratique est équivalent, mais ce n'est pas formellement les deux mécanismes indépendants de BigQuery (RLS + Policy Tag) | Tabular Editor ou un espace Fabric/Premium avec XMLA en écriture | Pas de sprint dédié — hors périmètre d'une licence Power BI Desktop gratuite |
 
-## Résolu ce sprint (Sprint 9)
+## Résolu ce sprint (Sprint 10)
+
+- ~~Pas de test end-to-end du pipeline complet~~ → `tests/test_e2e_pipeline.py`,
+  rejoue source → Bronze → raw → Gold (`dbt build`) → BI → reverse ETL n8n
+  sur les services Docker locaux, vérifie le résultat réel à chaque étape
+  (comptes de lignes, 47/47 tests dbt, fichier XLSX effectivement déposé
+  sur MinIO par le webhook `cloture-mensuelle`) — **exécuté et vérifié**,
+  pas juste écrit : run complet OK du premier coup
+- ~~Rapport Power BI absent~~ → `dashboards/powerbi/dbt_cg.pbix`
+  (« Pilotage CG »), détail dans [`docs/BI-POWERBI.md`](docs/BI-POWERBI.md)
+  ; dettes #9 et #10 ajoutées ci-dessus pour les limites RLS/OLS trouvées
+  en le construisant
+- ~~README incomplet~~ → sections MLOps et Power BI ajoutées (manquaient
+  entièrement), lien vers `docs/BI-POWERBI.md` ajouté au sommaire —
+  `docs/REFONTE-ERP.md` et `traceability/index.html` étaient déjà liés
+  depuis un sprint précédent, vérifié plutôt que refait
+
+## Résolu Sprint 9
 
 - ~~Pas de tableaux de bord BI~~ → `dashboards/` : 4 tableaux de bord
   HTML/JS (PDG, Contrôle de gestion, RH & Opérationnel, FinOps/Audit),

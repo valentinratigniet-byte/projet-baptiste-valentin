@@ -1,6 +1,6 @@
 # État des lieux
 
-Dernière mise à jour : Sprint 9 terminé (21/08/2026).
+Dernière mise à jour : Sprint 10 terminé (25/08/2026) — **projet complet, 10/10 sprints**.
 
 ## Avancement
 
@@ -15,7 +15,7 @@ Dernière mise à jour : Sprint 9 terminé (21/08/2026).
 | 7 | MLOps (forecasting, drift, chatbot) | ✅ terminé |
 | 8 | KPI Traçabilité interactive | ✅ terminé |
 | 9 | BI (4 tableaux de bord) | ✅ terminé |
-| 10 | Finition | ⬜ à venir |
+| 10 | Finition | ✅ terminé |
 
 Détail sprint par sprint avec les chiffres réels de chaque exécution :
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
@@ -36,18 +36,24 @@ Détail sprint par sprint avec les chiffres réels de chaque exécution :
 - **Traçabilité KPI** : `traceability/index.html` (repris du prototype solo `projet-14-filiation`), 32 nœuds introspectés depuis `dbt_cg` (11 sources, 10 staging, 11 marts), 107 colonnes avec lignage colonne-à-colonne réel (sqlglot). Nouveau par rapport au prototype : `erp-fiche.html`, fiche ERP legacy cliquable en lecture seule (2 500 lignes, recherche par NUMPCE/CDCLI) liée depuis les nœuds sources `erp_migre` — détail dans [`docs/TRACABILITE-KPI.md`](docs/TRACABILITE-KPI.md)
 - **BI** : `dashboards/index.html`, 4 tableaux de bord HTML/JS maison (Power BI/Looker Studio prévus au départ, mais aucun des deux n'est pilotable par API pour les visuels). CA réel 19,1 M€, écart Réel/Budget +1,03 M€, RLS+masking BigQuery prouvés en direct (rh-viewer : 0 ligne + colonne refusée ; Finance/Direction/PDG : 2 240 lignes, 11 847 943,82€), infobulles reliées à la traçabilité du Sprint 8 — détail dans [`docs/BI.md`](docs/BI.md)
 - **BI Power BI** : rapport **Pilotage CG** (`dashboards/powerbi/dbt_cg.pbix`), construit par Valentin en autonomie dans Power BI Desktop avec le modèle sémantique préparé côté assistant (MCP `powerbi-modeling`, couche modèle uniquement). 4 pages (Vue direction, Contrôle de gestion, RH & Opérationnel, FinOps/Audit), 14 tables, 17 mesures DAX, RLS 4 rôles testée par requête réelle (piège DAX `COUNTROWS` sous filtre `FALSE()` → `BLANK` et non `0`, corrigé) — détail complet dans [`docs/BI-POWERBI.md`](docs/BI-POWERBI.md)
+- **Test end-to-end** : `tests/test_e2e_pipeline.py` rejoue tout le pipeline (source → Bronze → raw → Gold dbt → BI → reverse ETL n8n) sur les services Docker locaux et vérifie le résultat réel à chaque étape — **exécuté, vert du premier coup** : 35 403 lignes source → Bronze, `dbt build` 47/47 tests, marts non vides (dim_date 1 826, fct_ventes_reel 6 769, fct_ecarts_reel_budget 2 316), fichier `liasse_ecarts_2026-08.xlsx` réellement déposé sur MinIO par le webhook `cloture-mensuelle`
 
 ## Dette technique ouverte
 
-Voir [`docs/DETTE-TECHNIQUE.md`](docs/DETTE-TECHNIQUE.md) — 8 lignes
+Voir [`docs/DETTE-TECHNIQUE.md`](docs/DETTE-TECHNIQUE.md) — 10 lignes
 ouvertes à ce stade (RLS/masking limité à 1 table sur 11 par choix de
 profondeur, intégrations Discord/Slack/Drive en placeholder faute de
 compte externe, chatbot sans routage RLS par profil, détection de drift
-sur un seul run, etc.), chacune avec son plafond connu. Rien n'est caché :
-plusieurs root causes ont été trouvées et corrigées en cours de route
-plutôt que contournées — dont trois pièges SSL différents sur trois piles
-réseau distinctes (OpenSSL, Node.js, gRPC) et une collision de variable
-d'environnement avec un autre projet GCP sur la même machine.
+sur un seul run, RLS Power BI testée en local sans vrai multi-utilisateur,
+pas d'OLS native côté Power BI, etc.), chacune avec son plafond connu et
+**explicitement actée comme limite assumée** (Definition of Done Sprint
+10, `docs/ROADMAP.md`) — aucune n'est cachée ou silencieusement ignorée.
+Plusieurs root causes ont par ailleurs été trouvées et corrigées en cours
+de route plutôt que contournées — dont trois pièges SSL différents sur
+trois piles réseau distinctes (OpenSSL, Node.js, gRPC), une collision de
+variable d'environnement avec un autre projet GCP sur la même machine, et
+un piège DAX (`COUNTROWS` sous filtre `FALSE()` → `BLANK`) trouvé en
+testant la RLS du rapport Power BI.
 
 ## Historique des versions
 
